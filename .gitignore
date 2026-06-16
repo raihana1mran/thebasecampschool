@@ -1,0 +1,17 @@
+.env
+.env.backup
+.env.production
+node_modules
+vendor
+/public/storage
+/storage/*.key
+.phpunit.result.cache
+.idea
+.vscode
+Thumbs.db
+.DS_Store
+*.log
+composer.phar
+composer-setup.php
+/backend/node_modules
+/backend/.env
