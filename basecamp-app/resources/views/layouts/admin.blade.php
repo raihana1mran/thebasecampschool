@@ -14,6 +14,7 @@
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
         .signature-gradient { background: linear-gradient(135deg, #006479 0%, #40cef3 100%); }
         .glass-panel { background: rgba(255,255,255,0.7); backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.2); }
+        [x-cloak] { display: none !important; }
 
         /* Sidebar width transitions */
         #admin-sidebar { transition: width 0.35s cubic-bezier(0.4,0,0.2,1), transform 0.35s cubic-bezier(0.4,0,0.2,1); }
@@ -116,7 +117,7 @@
         @php
             $navLinks = [
                 ['name' => __('overview_title'), 'icon' => 'dashboard',        'route' => 'admin.dashboard'],
-                ['name' => __('students'),       'icon' => 'group',            'route' => 'admin.students'],
+                // ['name' => __('students'),       'icon' => 'group',            'route' => 'admin.students'],
                 ['name' => __('enrollments'),    'icon' => 'fact_check',       'route' => 'admin.admissions'],
                 ['name' => __('digital_library'),'icon' => 'library_books',    'route' => 'admin.products'],
                 ['name' => __('mock_tests'),     'icon' => 'quiz',             'route' => 'admin.mocktests'],

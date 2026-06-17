@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\EnrollmentCredentials;
 use App\Models\Admission;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class AdmissionController extends Controller
@@ -170,7 +172,7 @@ class AdmissionController extends Controller
     public function updateAdmissionStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:Pending,Approved,Rejected,Document Error',
+            'status' => 'required|in:Pending,Approved,Rejected,Document Error,Need to Pay Fees',
         ]);
 
         $admission = Admission::find($id);
@@ -184,6 +186,28 @@ class AdmissionController extends Controller
 
         $admission->status = $request->status;
         $admission->save();
+
+        // When approved, generate enrollment number & password for the student user
+        if ($request->status === 'Approved' && $admission->user) {
+            $user = $admission->user;
+            if (!$user->enrollment_number) {
+                $user->enrollment_number = 'TBC-' . date('Y') . '-' . strtoupper(\Illuminate\Support\Str::random(6));
+            }
+            $temporaryPassword = \Illuminate\Support\Str::random(8);
+            $user->password = \Illuminate\Support\Facades\Hash::make($temporaryPassword);
+            $user->save();
+
+            Mail::to($user->email)->send(new EnrollmentCredentials($user, $temporaryPassword));
+
+            return response()->json([
+                'success' => true,
+                'data' => $admission,
+                'credentials' => [
+                    'enrollment_number' => $user->enrollment_number,
+                    'password' => $temporaryPassword,
+                ]
+            ]);
+        }
 
         return response()->json([
             'success' => true,
@@ -203,10 +227,17 @@ class AdmissionController extends Controller
             return back()->with('error', 'No admission found with that Reference Number.');
         }
 
+        $messages = \App\Models\BroadcastMessage::where('audience', $admission->email)
+            ->where('created_at', '>=', \Carbon\Carbon::now()->subDays(7))
+            ->latest()->get();
+
         return back()->with('status_result', [
             'full_name' => $admission->full_name,
             'course_type' => $admission->course_type,
             'status' => $admission->status,
+            'reference_number' => $admission->reference_number,
+            'email' => $admission->email,
+            'messages' => $messages,
         ]);
     }
 }

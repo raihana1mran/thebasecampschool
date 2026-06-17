@@ -11,11 +11,30 @@ class AdminController extends Controller
     public function dashboard()
     {
         $studentCount = User::where('role', 'student')->count();
+        $activeStudents = User::where('role', 'student')
+            ->whereNotNull('first_login_at')
+            ->whereHas('admissions', fn($q) => $q->where('status', 'Approved'))
+            ->count();
         $pendingAdmissions = Admission::where('status', 'Pending')->count();
         $digitalProducts = \App\Models\Product::count();
-        $recentAdmissions = Admission::orderBy('created_at', 'desc')->take(5)->get();
 
-        return view('admin.dashboard', compact('studentCount', 'pendingAdmissions', 'digitalProducts', 'recentAdmissions'));
+        $recentAdmissions = Admission::with('user')
+            ->orderBy('created_at', 'desc')->take(5)->get();
+
+        $newEnrollments = Admission::with('user')
+            ->orderBy('created_at', 'desc')->take(10)->get();
+
+        $activeStudentsList = User::where('role', 'student')
+            ->whereNotNull('first_login_at')
+            ->whereHas('admissions', fn($q) => $q->where('status', 'Approved'))
+            ->with(['admissions' => fn($q) => $q->where('status', 'Approved')->latest()])
+            ->latest()->take(10)->get();
+
+        return view('admin.dashboard', compact(
+            'studentCount', 'activeStudents', 'pendingAdmissions',
+            'digitalProducts', 'recentAdmissions', 'newEnrollments',
+            'activeStudentsList'
+        ));
     }
 
     public function stats()
@@ -135,6 +154,23 @@ class AdminController extends Controller
         ]);
     }
 
+    public function sendStudentMessage(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => 'required|email',
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string|max:5000',
+        ]);
+
+        \App\Models\BroadcastMessage::create([
+            'audience' => $validated['email'],
+            'subject' => $validated['subject'],
+            'message' => $validated['message'],
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Message sent.']);
+    }
+
     public function createStudent(Request $request)
     {
         $validated = $request->validate([
@@ -171,7 +207,7 @@ class AdminController extends Controller
 
     public function showEnrollmentForm()
     {
-        return view('admin.enroll');
+        return view('admin.enroll', ['errorStep' => old('_errorStep', 1)]);
     }
 
     public function submitEnrollmentForm(Request $request)

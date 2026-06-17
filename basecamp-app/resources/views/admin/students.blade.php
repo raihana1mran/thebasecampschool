@@ -89,6 +89,7 @@
             background: linear-gradient(135deg, #006479 0%, #40cef3 100%);
         }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
+        [x-cloak] { display: none !important; }
     </style>
 
     <div x-data="{
@@ -153,7 +154,7 @@
             fetch(`/admin/tma-submissions/${sub.id}/marks`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
-                body: JSON.stringify({ tma_marks: sub.tmaMarks, practical_marks: sub.practicalMarks, admin_remarks: sub.remarks })
+                body: JSON.stringify({ tma_marks: sub.tmaMarks || null, practical_marks: sub.practicalMarks || null, admin_remarks: sub.remarks || '' })
             })
             .then(r => r.json())
             .then(data => {
@@ -175,12 +176,12 @@
             this.isDocPreviewOpen = true;
         },
         downloadDoc(url, filename) {
-            fetch(url).then(r => r.blob()).then(blob => {
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = filename || 'document';
-                document.body.appendChild(a); a.click(); document.body.removeChild(a);
-            }).catch(() => window.open(url, '_blank'));
+            if (!url || url === '/storage/') return;
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename || 'document';
+            a.target = '_blank';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
         },
         exportCSV() {
             let csvContent = 'ID,Name,Email,Enrollment,Class,Stream,Status\\n';
@@ -470,27 +471,30 @@
                                                 ];
                                             })->values()->toArray();
                                         @endphp
+                                        @php
+                                            $profileData = [
+                                                'id' => $studentId,
+                                                'userId' => $student->id,
+                                                'name' => $student->name,
+                                                'email' => $student->email,
+                                                'phone' => $latestAdmission->mobile_number ?? '',
+                                                'enrollmentNumber' => $student->enrollment_number ?? '',
+                                                'class' => $class,
+                                                'stream' => $stream,
+                                                'status' => $status,
+                                                'docs' => [
+                                                    'photo' => $docs['photo'] ?? '',
+                                                    'signature' => $docs['signature'] ?? '',
+                                                    'idProof' => $docs['idProof'] ?? '',
+                                                    'addressProof' => $docs['addressProof'] ?? '',
+                                                    'previousMarksheet' => $docs['previousMarksheet'] ?? '',
+                                                    'categoryCertificate' => $docs['categoryCertificate'] ?? '',
+                                                ],
+                                                'tmaSubmissions' => $allTmaData,
+                                            ];
+                                        @endphp
                                         <button
-                                            @click="openProfile({
-                                                id: '{{ $studentId }}',
-                                                userId: {{ $student->id }},
-                                                name: '{{ addslashes($student->name) }}',
-                                                email: '{{ addslashes($student->email) }}',
-                                                phone: '{{ addslashes($latestAdmission->mobile_number ?? '') }}',
-                                                enrollmentNumber: '{{ addslashes($student->enrollment_number ?? '') }}',
-                                                class: '{{ $class }}',
-                                                stream: '{{ $stream }}',
-                                                status: '{{ $status }}',
-                                                docs: {
-                                                    photo: '{{ addslashes($docs['photo'] ?? '') }}',
-                                                    signature: '{{ addslashes($docs['signature'] ?? '') }}',
-                                                    idProof: '{{ addslashes($docs['idProof'] ?? '') }}',
-                                                    addressProof: '{{ addslashes($docs['addressProof'] ?? '') }}',
-                                                    previousMarksheet: '{{ addslashes($docs['previousMarksheet'] ?? '') }}',
-                                                    categoryCertificate: '{{ addslashes($docs['categoryCertificate'] ?? '') }}',
-                                                },
-                                                tmaSubmissions: {!! json_encode($allTmaData) !!}
-                                            })"
+                                            @click="openProfile(@json($profileData))"
                                             class="flex items-center gap-1.5 px-3 py-2 hover:bg-primary/10 text-primary rounded-lg transition-colors text-xs font-bold border border-primary/20"
                                             title="View Full Profile"
                                         >
@@ -606,7 +610,7 @@
         </section>
 
         <!-- Broadcast Message Modal -->
-        <div x-show="isMessageModalOpen" class="fixed inset-0 z-50 flex items-center justify-center px-4" style="display: none;">
+        <div x-show="isMessageModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center px-4">
             <div 
                 x-show="isMessageModalOpen"
                 @click="isMessageModalOpen = false"
@@ -724,7 +728,7 @@
         </div>
 
         <!-- Quick Add Student Modal -->
-        <div x-show="isAddStudentModalOpen" class="fixed inset-0 z-50 flex items-center justify-center px-4" style="display: none;">
+        <div x-show="isAddStudentModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center px-4">
             <div 
                 x-show="isAddStudentModalOpen"
                 @click="isAddStudentModalOpen = false"
@@ -801,7 +805,7 @@
         </div>
 
         <!-- Update Status Modal -->
-        <div x-show="isStatusModalOpen" class="fixed inset-0 z-50 flex items-center justify-center px-4" style="display: none;">
+        <div x-show="isStatusModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center px-4">
             <div 
                 x-show="isStatusModalOpen"
                 @click="isStatusModalOpen = false"
@@ -892,7 +896,7 @@
         <!-- ==========================================
              STUDENT PROFILE DRAWER
              ========================================== -->
-        <div x-show="isProfileDrawerOpen" class="fixed inset-0 z-[80] flex items-stretch justify-end" style="display:none;">
+        <div x-show="isProfileDrawerOpen" x-cloak class="fixed inset-0 z-[80] flex items-stretch justify-end">
             <!-- Backdrop -->
             <div x-show="isProfileDrawerOpen" @click="isProfileDrawerOpen = false"
                 x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
@@ -1128,7 +1132,7 @@
         <!-- ==========================================
              DOCUMENT PREVIEW OVERLAY (shared)
              ========================================== -->
-        <div x-show="isDocPreviewOpen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center" style="display:none;">
+        <div x-show="isDocPreviewOpen" x-cloak class="fixed inset-0 z-[100] flex flex-col items-center justify-center">
             <div x-show="isDocPreviewOpen" @click="isDocPreviewOpen = false"
                 x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                 x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"

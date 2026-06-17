@@ -29,7 +29,7 @@
     @endif
 
     <div x-data="{
-        activeStep: {{ $errors->any() ? $errorStep : 1 }},
+        activeStep: {{ $errors->any() ? ($errorStep ?? old('_errorStep', 1)) : 1 }},
         courseType: '{{ old('courseType', 'Secondary') }}',
         fullName: '{{ old('fullName', '') }}',
         aadhaarNumber: '{{ old('aadhaarNumber', '') }}',
@@ -399,6 +399,7 @@
 
         <form method="POST" action="{{ route('admin.admissions.store') }}" enctype="multipart/form-data">
             @csrf
+            <input type="hidden" name="_errorStep" :value="activeStep">
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 <!-- Left Column: Forms -->

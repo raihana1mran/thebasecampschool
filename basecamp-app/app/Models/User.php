@@ -31,6 +31,7 @@ class User extends Authenticatable
         'otp',
         'otp_expire',
         'enrollment_number',
+        'first_login_at',
     ];
 
     /**
@@ -57,6 +58,7 @@ class User extends Authenticatable
             'unlocked_products' => 'array',
             'is_verified' => 'boolean',
             'otp_expire' => 'datetime',
+            'first_login_at' => 'datetime',
         ];
     }
 

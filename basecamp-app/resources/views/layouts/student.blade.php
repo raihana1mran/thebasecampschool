@@ -2,8 +2,11 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="light">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="theme-color" content="#f0f4f8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>{{ config('app.name', 'thebasecampschool') }} - Student Dashboard</title>
 
     <!-- Fonts & Icons -->
@@ -22,6 +25,15 @@
         body { font-family: 'Space Grotesk', sans-serif; background-color: #f0f4f8; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
         .signature-gradient { background: linear-gradient(135deg, #006479 0%, #40cef3 100%); }
+        [x-cloak] { display: none !important; }
+
+        * { -webkit-tap-highlight-color: transparent; }
+
+        /* Safe area support for iPhone notch/Dynamic Island */
+        .safe-top { padding-top: env(safe-area-inset-top, 0px); }
+        .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+        .safe-left { padding-left: env(safe-area-inset-left, 0px); }
+        .safe-right { padding-right: env(safe-area-inset-right, 0px); }
 
         /* Sidebar & content transitions */
         #student-sidebar { transition: width 0.35s cubic-bezier(0.4,0,0.2,1), transform 0.35s cubic-bezier(0.4,0,0.2,1); }
@@ -61,12 +73,28 @@
         #student-sidebar::-webkit-scrollbar-track { background: transparent; }
         #student-sidebar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
 
+        /* Prevent horizontal overflow */
+        .overflow-x-visible { overflow-x: visible; }
+        img, video, iframe, svg { max-width: 100%; height: auto; }
+
         /* Mobile hidden by default */
         @media (max-width: 1023px) {
             #student-sidebar { transform: translateX(-110%); }
             #student-sidebar.mobile-open { transform: translateX(0); }
             #student-main { margin-left: 0 !important; }
             #sidebar-overlay.active { display: block; }
+            .safe-top { padding-top: max(env(safe-area-inset-top, 0px), 8px); }
+        }
+
+        @media (max-width: 430px) {
+            .container-px { padding-left: 16px; padding-right: 16px; }
+            .text-responsive-xs { font-size: clamp(0.625rem, 2.5vw, 0.75rem); }
+            .text-responsive-sm { font-size: clamp(0.75rem, 3vw, 0.875rem); }
+            .text-responsive-base { font-size: clamp(0.875rem, 3.5vw, 1rem); }
+            .text-responsive-lg { font-size: clamp(1rem, 4vw, 1.25rem); }
+            .text-responsive-xl { font-size: clamp(1.25rem, 5vw, 1.5rem); }
+            .text-responsive-2xl { font-size: clamp(1.5rem, 6vw, 2rem); }
+            .text-responsive-3xl { font-size: clamp(1.75rem, 7vw, 2.5rem); }
         }
     </style>
 </head>
@@ -250,29 +278,29 @@
                overflow-hidden h-full lg:h-[calc(100vh-2rem)]"
     >
         <!-- Top Nav -->
-        <header class="flex items-center justify-between w-full px-5 py-4 bg-white/80 backdrop-blur-xl border-b border-slate-100/80 shrink-0">
-            <div class="flex items-center gap-3">
-                <button @click="toggleExpand()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-500 transition-colors">
-                    <span class="material-symbols-outlined">menu</span>
+        <header class="flex items-center justify-between w-full px-3 sm:px-5 py-3 sm:py-4 bg-white/80 backdrop-blur-xl border-b border-slate-100/80 shrink-0 safe-top">
+            <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                <button @click="toggleExpand()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-500 transition-colors shrink-0">
+                    <span class="material-symbols-outlined text-[20px] sm:text-[24px]">menu</span>
                 </button>
-                <div>
-                    <h1 class="text-[15px] font-bold text-slate-800 leading-none">{{ __('student_command_center') }}</h1>
-                    <p class="text-[11px] text-slate-400 mt-0.5">thebasecampschool</p>
+                <div class="min-w-0">
+                    <h1 class="text-[13px] sm:text-[15px] font-bold text-slate-800 leading-none truncate">{{ __('student_command_center') }}</h1>
+                    <p class="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">thebasecampschool</p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-1 sm:gap-2">
+            <div class="flex items-center gap-1 sm:gap-2 shrink-0">
                 <!-- Language Switcher -->
                 <div x-data="{ langOpen: false }" class="relative">
                     <button @click="langOpen = !langOpen"
-                        class="flex items-center gap-1.5 px-2 py-2 rounded-xl hover:bg-slate-100 text-slate-500 transition-colors text-sm font-semibold" type="button">
-                        <span class="material-symbols-outlined text-[18px]">translate</span>
-                        <span class="hidden lg:inline">{{ ['en'=>'English','hi'=>'हिन्दी','bn'=>'বাংলা','te'=>'తెలుగు','mr'=>'मराठी','ta'=>'தமிழ்','gu'=>'ગુજરાતી','kn'=>'കന്നಡ','ml'=>'മലയാളം','pa'=>'ਪੰਜਾਬੀ','ur'=>'اردو'][session('locale', 'en')] ?? 'English' }}</span>
+                        class="flex items-center gap-1 px-1.5 sm:px-2 py-2 rounded-xl hover:bg-slate-100 text-slate-500 transition-colors text-sm font-semibold" type="button">
+                        <span class="material-symbols-outlined text-[18px] sm:text-[20px]">translate</span>
+                        <span class="hidden lg:inline text-xs">{{ ['en'=>'English','hi'=>'हिन्दी','bn'=>'বাংলা','te'=>'తెలుగు','mr'=>'मराठी','ta'=>'தமிழ்','gu'=>'ગુજરાતી','kn'=>'കന്നడ','ml'=>'മലയാളം','pa'=>'ਪੰਜਾਬੀ','ur'=>'اردو'][session('locale', 'en')] ?? 'English' }}</span>
                     </button>
                     <div x-show="langOpen" @click.outside="langOpen = false"
                         class="absolute right-0 top-full mt-2 w-44 bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-200/50 z-50 py-2 max-h-64 overflow-y-auto"
-                        style="display:none;">
-                        @foreach(['en'=>'English','hi'=>'हिन्दी','bn'=>'বাংলা','te'=>'తెలుగు','mr'=>'मराठी','ta'=>'தமிழ்','gu'=>'ગુજરાતી','kn'=>'കന്നಡ','ml'=>'മലയാളം','pa'=>'ਪੰਜਾਬી','ur'=>'اردو'] as $code => $native)
+                        x-cloak>
+                        @foreach(['en'=>'English','hi'=>'हिन्दी','bn'=>'বাংলা','te'=>'తెలుగు','mr'=>'मराठी','ta'=>'தமிழ்','gu'=>'ગુજરાતી','kn'=>'കന്നడ','ml'=>'മലയാളം','pa'=>'ਪੰਜਾਬੀ','ur'=>'اردو'] as $code => $native)
                         <a href="{{ route('language.switch', $code) }}"
                            class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors
                                   {{ (session('locale', 'en') === $code) ? 'bg-cyan-50 text-cyan-700' : 'text-slate-600 hover:bg-slate-50' }}">
@@ -282,29 +310,29 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-1.5 sm:gap-2 bg-slate-50 border border-slate-100 px-2 sm:px-3 py-2 rounded-full cursor-pointer group hover:bg-red-50 hover:border-red-100 transition-all"
+                <div class="flex items-center gap-1 sm:gap-2 bg-slate-50 border border-slate-100 px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-full cursor-pointer group hover:bg-red-50 hover:border-red-100 transition-all min-w-0"
                      onclick="document.getElementById('sidebar-logout-form').submit()">
-                    <span class="material-symbols-outlined text-[18px] text-cyan-600 group-hover:text-red-500 transition-colors" style="font-variation-settings: 'FILL' 1;">account_circle</span>
-                    <span class="text-[12px] font-medium text-slate-700 hidden sm:inline group-hover:text-red-600 transition-colors">{{ Auth::user()->name ?? 'Student' }}</span>
-                    <span class="material-symbols-outlined text-[16px] text-slate-400 group-hover:text-red-500 transition-colors">logout</span>
+                    <span class="material-symbols-outlined text-[16px] sm:text-[18px] text-cyan-600 group-hover:text-red-500 transition-colors shrink-0" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+                    <span class="text-[10px] sm:text-[12px] font-medium text-slate-700 hidden sm:inline group-hover:text-red-600 transition-colors truncate max-w-[80px]">{{ Auth::user()->name ?? 'Student' }}</span>
+                    <span class="material-symbols-outlined text-[14px] sm:text-[16px] text-slate-400 group-hover:text-red-500 transition-colors shrink-0">logout</span>
                 </div>
             </div>
         </header>
 
         <!-- Page Content -->
-        <main class="flex-grow overflow-y-auto px-5 md:px-10 py-7 relative">
+        <main class="flex-grow overflow-y-auto overflow-x-hidden px-3 sm:px-5 md:px-10 py-5 sm:py-7 relative">
             <!-- Decorative blobs -->
             <div class="fixed top-20 right-[-10%] w-[400px] h-[400px] bg-cyan-400/8 rounded-full blur-[100px] pointer-events-none -z-10"></div>
             <div class="fixed bottom-[-10%] left-[-5%] w-[350px] h-[350px] bg-blue-400/8 rounded-full blur-[80px] pointer-events-none -z-10"></div>
 
             @if(session('error'))
-            <div class="mb-6 bg-red-50 border border-red-200 text-red-700 rounded-2xl px-6 py-4 flex items-center gap-3">
-                <span class="material-symbols-outlined text-red-500">warning</span>
-                <div>
-                    <p class="font-bold text-sm">Access Restricted</p>
-                    <p class="text-sm">{{ session('error') }}</p>
+            <div class="mb-4 sm:mb-6 bg-red-50 border border-red-200 text-red-700 rounded-2xl px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <span class="material-symbols-outlined text-red-500 shrink-0">warning</span>
+                <div class="min-w-0 flex-1">
+                    <p class="font-bold text-xs sm:text-sm">Access Restricted</p>
+                    <p class="text-xs sm:text-sm">{{ session('error') }}</p>
                 </div>
-                <a href="{{ url('/application') }}" class="ml-auto bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-700 transition-colors whitespace-nowrap">Select Course</a>
+                <a href="{{ url('/application') }}" class="w-full sm:w-auto text-center bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-700 transition-colors whitespace-nowrap">Select Course</a>
             </div>
             @endif
 
@@ -312,9 +340,9 @@
         </main>
 
         <!-- Footer -->
-        <footer class="px-5 py-3 border-t border-slate-100 shrink-0 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <p class="text-[11px] text-slate-400">© 2024 thebasecampschool. All Rights Reserved.</p>
-            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Developed by Wolfcore Technology</p>
+        <footer class="px-3 sm:px-5 py-3 border-t border-slate-100 shrink-0 flex flex-col sm:flex-row items-center justify-between gap-2 safe-bottom">
+            <p class="text-[10px] sm:text-[11px] text-slate-400 text-center sm:text-left">© 2024 thebasecampschool. All Rights Reserved.</p>
+            <p class="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider">Developed by Wolfcore Technology</p>
         </footer>
     </div>
 </div>

@@ -152,17 +152,14 @@
             this.isPreviewOpen = true;
         },
         downloadDoc(url, filename) {
-            fetch(url)
-                .then(r => r.blob())
-                .then(blob => {
-                    const a = document.createElement('a');
-                    a.href = URL.createObjectURL(blob);
-                    a.download = filename || 'document';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                })
-                .catch(() => window.open(url, '_blank'));
+            if (!url || url === '/storage/') return;
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename || 'document';
+            a.target = '_blank';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         },
         exportCSV() {
             let csvContent = 'ID,Name,Email,Mobile,Course,Status,Created At\n';

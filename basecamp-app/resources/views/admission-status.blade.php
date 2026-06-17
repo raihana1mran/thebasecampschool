@@ -70,16 +70,44 @@
                     </div>
                     <div class="flex justify-between pt-2 items-center">
                         <span class="text-on-surface-variant">Current Status</span>
-                        <span class="font-bold px-3 py-1 rounded-full text-xs uppercase tracking-wider
-                            @if(session('status_result')['status'] == 'Approved') bg-green-100 text-green-800
-                            @elseif(session('status_result')['status'] == 'Pending') bg-yellow-100 text-yellow-800
-                            @else bg-red-100 text-red-800
-                            @endif">
-                            {{ session('status_result')['status'] }}
+                        @php
+                            $status = session('status_result')['status'];
+                            $statusColor = match($status) {
+                                'Approved' => 'bg-green-100 text-green-800',
+                                'Pending' => 'bg-yellow-100 text-yellow-800',
+                                'Rejected' => 'bg-red-100 text-red-800',
+                                'Document Error' => 'bg-orange-100 text-orange-800',
+                                'Need to Pay Fees' => 'bg-purple-100 text-purple-800',
+                                default => 'bg-slate-100 text-slate-800',
+                            };
+                        @endphp
+                        <span class="font-bold px-3 py-1 rounded-full text-xs uppercase tracking-wider {{ $statusColor }}">
+                            {{ $status }}
                         </span>
                     </div>
                 </div>
             </div>
+
+            @php $messages = session('status_result')['messages'] ?? null; @endphp
+            @if($messages && count($messages) > 0)
+            <div class="bg-white p-5 rounded-2xl mb-6 border border-cyan-200/50 shadow-sm">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="material-symbols-outlined text-primary text-lg">notifications_active</span>
+                    <h3 class="font-bold text-sm text-slate-800">Messages from Administration</h3>
+                </div>
+                <div class="space-y-3 max-h-[260px] overflow-y-auto">
+                    @foreach($messages as $msg)
+                    <div class="p-3 bg-cyan-50/60 rounded-xl border border-cyan-100">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <h4 class="font-bold text-xs text-slate-800">{{ $msg->subject }}</h4>
+                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider shrink-0">{{ $msg->created_at->diffForHumans() }}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-600 leading-relaxed">{{ $msg->message }}</p>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
         @endif
 
         <form method="POST" action="{{ route('admission.status.check') }}" class="space-y-4">

@@ -65,14 +65,38 @@ Route::get('/dashboard', function () {
         return redirect()->route('admin.dashboard');
     }
     
+    // Restrict access: student must have an approved admission with enrollment number
+    $admission = \App\Models\Admission::where('user_id', $user->id)->first();
+    $hasApprovedAdmission = $admission && $admission->status === 'Approved';
+    $hasEnrollmentNumber = (bool) $user->enrollment_number;
+    
+    // If no approved admission or no enrollment number, show onboarding/status page
+    if (!$hasApprovedAdmission || !$hasEnrollmentNumber) {
+        $statusResult = $admission ? [
+            'full_name' => $admission->full_name,
+            'course_type' => $admission->course_type,
+            'status' => $admission->status,
+            'reference_number' => $admission->reference_number,
+            'message' => $hasEnrollmentNumber
+                ? 'Your admission is being reviewed. Please wait for approval.'
+                : ($admission && $admission->status === 'Approved'
+                    ? 'Your admission is approved! Admin will share your enrollment number and password shortly via email.'
+                    : 'Your admission is being processed. Check back later.'),
+        ] : null;
+        return view('student-onboarding', compact('statusResult', 'admission'));
+    }
+    
+    // Mark student as active on first successful dashboard access
+    if (!$user->first_login_at) {
+        $user->update(['first_login_at' => now()]);
+    }
+
     $tmaCount = \App\Models\Product::where('category', 'tma')->count();
     $resourceCount = \App\Models\Product::where('category', '!=', 'tma')->count();
     $mockTestCount = \App\Models\MockTest::count();
     
     $tmas = \App\Models\Product::where('category', 'tma')->latest()->take(5)->get();
     $resources = \App\Models\Product::where('category', '!=', 'tma')->latest()->take(5)->get();
-    
-    $admission = \App\Models\Admission::where('user_id', $user->id)->first();
     
     $isBlock1 = false;
     $isBlock2 = false;
@@ -147,6 +171,7 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::put('/admissions/{id}/status', [App\Http\Controllers\AdmissionController::class, 'updateAdmissionStatus'])->name('admin.admissions.status');
     Route::patch('/students/{id}/enrollment', [AdminController::class, 'updateEnrollmentNumber'])->name('admin.students.enrollment');
     Route::put('/tma-submissions/{id}/marks', [AdminController::class, 'updateTmaMarks'])->name('admin.tma.marks');
+    Route::post('/student-message', [AdminController::class, 'sendStudentMessage'])->name('admin.student.message');
 });
 
 use App\Http\Controllers\AdmissionController;
@@ -160,6 +185,19 @@ Route::middleware('auth')->group(function () {
     
     Route::post('/admissions', [AdmissionController::class, 'submitAdmission'])->name('admissions.submit');
     Route::post('/tma/{productId}/submit', [TmaController::class, 'submit'])->name('tma.submit');
+    
+    Route::post('/student/message', function () {
+        $data = request()->validate([
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string|max:5000',
+        ]);
+        \App\Models\BroadcastMessage::create([
+            'audience' => auth()->user()->email,
+            'subject' => '[Student Query] ' . $data['subject'],
+            'message' => $data['message'],
+        ]);
+        return response()->json(['success' => true]);
+    })->name('student.message');
     
     Route::get('/mocktests', function () {
         $user = auth()->user();
