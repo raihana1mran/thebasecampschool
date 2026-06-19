@@ -68,7 +68,7 @@
             </div>
             
             <div class="space-y-3">
-                <a href="{{ route('subpage', '12th-biology') }}" class="w-full sm:w-auto min-h-[44px] signature-gradient text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md shadow-cyan-900/20 transition-all text-sm">
+                <a href="{{ route('lessons.chapters', '314') }}" class="w-full sm:w-auto min-h-[44px] signature-gradient text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md shadow-cyan-900/20 transition-all text-sm">
                     Start Learning <span class="material-symbols-outlined text-lg">arrow_forward</span>
                 </a>
             </div>
@@ -95,7 +95,7 @@
             </div>
             
             <div class="space-y-3 mt-auto">
-                <a href="{{ route('subpage', '12th-biology') }}" class="w-full sm:w-auto min-h-[44px] bg-cyan-600 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md shadow-cyan-600/20 transition-all text-sm">
+                <a href="{{ route('lessons.chapters', '312') }}" class="w-full sm:w-auto min-h-[44px] bg-cyan-600 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md shadow-cyan-600/20 transition-all text-sm">
                     Start Learning <span class="material-symbols-outlined text-lg">arrow_forward</span>
                 </a>
             </div>
@@ -122,7 +122,7 @@
             </div>
             
             <div class="space-y-3 mt-auto">
-                <a href="{{ route('subpage', '12th-biology') }}" class="w-full sm:w-auto min-h-[44px] bg-indigo-600 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md shadow-indigo-600/20 transition-all text-sm">
+                <a href="{{ route('lessons.chapters', '313') }}" class="w-full sm:w-auto min-h-[44px] bg-indigo-600 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md shadow-indigo-600/20 transition-all text-sm">
                     Start Learning <span class="material-symbols-outlined text-lg">arrow_forward</span>
                 </a>
             </div>
@@ -149,7 +149,7 @@
             </div>
             
             <div class="space-y-3 mt-auto">
-                <a href="{{ route('subpage', '12th-biology') }}" class="w-full sm:w-auto min-h-[44px] bg-amber-500 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md shadow-amber-500/20 transition-all text-sm">
+                <a href="{{ route('lessons.chapters', '302') }}" class="w-full sm:w-auto min-h-[44px] bg-amber-500 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md shadow-amber-500/20 transition-all text-sm">
                     Start Learning <span class="material-symbols-outlined text-lg">arrow_forward</span>
                 </a>
             </div>

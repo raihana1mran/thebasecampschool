@@ -113,28 +113,43 @@ class ProductController extends Controller
         $product = Product::find($id);
 
         if (!$product) {
-            return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+            }
+            return back()->with('error', 'Product not found');
         }
 
         $unlockedProducts = $user->unlocked_products ?? [];
 
         if (in_array((string)$product->id, $unlockedProducts) || in_array($product->id, $unlockedProducts)) {
-            return response()->json(['success' => true, 'message' => 'Product already unlocked', 'product' => $product]);
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'message' => 'Product already unlocked', 'product' => $product]);
+            }
+            return back()->with('success', 'Product already unlocked');
         }
 
         if ($user->membership_plan === 'premium') {
             $unlockedProducts[] = $product->id;
             $user->unlocked_products = $unlockedProducts;
             $user->save();
-            return response()->json(['success' => true, 'message' => 'Product unlocked successfully (Premium)', 'product' => $product]);
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'message' => 'Product unlocked successfully (Premium)', 'product' => $product]);
+            }
+            return back()->with('success', 'Product unlocked successfully!');
         } else {
             if (count($unlockedProducts) >= 5) {
-                return response()->json(['success' => false, 'message' => 'Free plan limit reached (5 materials). Please upgrade to Premium.'], 403);
+                if ($request->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Free plan limit reached (5 materials). Please upgrade to Premium.'], 403);
+                }
+                return back()->with('error', 'Free plan limit reached (5 materials). Please upgrade to Premium.');
             }
             $unlockedProducts[] = $product->id;
             $user->unlocked_products = $unlockedProducts;
             $user->save();
-            return response()->json(['success' => true, 'message' => 'Product unlocked successfully (Free plan)', 'product' => $product]);
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'message' => 'Product unlocked successfully (Free plan)', 'product' => $product]);
+            }
+            return back()->with('success', 'Product unlocked successfully!');
         }
     }
 }

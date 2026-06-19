@@ -68,12 +68,12 @@
             </div>
             
             <div class="space-y-3">
-                <button class="w-full signature-gradient text-white min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md shadow-cyan-900/20 transition-all text-sm">
+                <a href="{{ route('lessons.chapters', '201') }}" class="w-full signature-gradient text-white min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md shadow-cyan-900/20 transition-all text-sm">
                     Start Learning <span class="material-symbols-outlined text-lg">arrow_forward</span>
-                </button>
-                <button class="w-full bg-[#f2f7f9] text-slate-700 min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-white border border-slate-200 shadow-sm transition-all text-sm">
+                </a>
+                <a href="{{ route('syllabus.download', '201') }}" download class="w-full bg-[#f2f7f9] text-slate-700 min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-white border border-slate-200 shadow-sm transition-all text-sm">
                     <span class="material-symbols-outlined text-lg">download</span> Download Syllabus
-                </button>
+                </a>
             </div>
         </div>
 
@@ -98,12 +98,12 @@
             </div>
             
             <div class="space-y-3 mt-auto">
-                <button class="w-full bg-cyan-600 text-white min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md shadow-cyan-600/20 transition-all text-sm">
+                <a href="{{ route('lessons.chapters', '211') }}" class="w-full bg-cyan-600 text-white min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md shadow-cyan-600/20 transition-all text-sm">
                     Start Learning <span class="material-symbols-outlined text-lg">arrow_forward</span>
-                </button>
-                <button class="w-full bg-[#f2f7f9] text-slate-700 min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-white border border-slate-200 shadow-sm transition-all text-sm">
+                </a>
+                <a href="{{ route('syllabus.download', '211') }}" download class="w-full bg-[#f2f7f9] text-slate-700 min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-white border border-slate-200 shadow-sm transition-all text-sm">
                     <span class="material-symbols-outlined text-lg">download</span> Download Syllabus
-                </button>
+                </a>
             </div>
         </div>
 
@@ -128,12 +128,12 @@
             </div>
             
             <div class="space-y-3 mt-auto">
-                <button class="w-full bg-indigo-600 text-white min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md shadow-indigo-600/20 transition-all text-sm">
+                <a href="{{ route('lessons.chapters', '212') }}" class="w-full bg-indigo-600 text-white min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md shadow-indigo-600/20 transition-all text-sm">
                     Start Learning <span class="material-symbols-outlined text-lg">arrow_forward</span>
-                </button>
-                <button class="w-full bg-[#f2f7f9] text-slate-700 min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-white border border-slate-200 shadow-sm transition-all text-sm">
+                </a>
+                <a href="{{ route('syllabus.download', '212') }}" download class="w-full bg-[#f2f7f9] text-slate-700 min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-white border border-slate-200 shadow-sm transition-all text-sm">
                     <span class="material-symbols-outlined text-lg">download</span> Download Syllabus
-                </button>
+                </a>
             </div>
         </div>
 
@@ -158,12 +158,12 @@
             </div>
             
             <div class="space-y-3 mt-auto">
-                <button class="w-full bg-amber-500 text-white min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md shadow-amber-500/20 transition-all text-sm">
+                <a href="{{ route('lessons.chapters', '213') }}" class="w-full bg-amber-500 text-white min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md shadow-amber-500/20 transition-all text-sm">
                     Start Learning <span class="material-symbols-outlined text-lg">arrow_forward</span>
-                </button>
-                <button class="w-full bg-[#f2f7f9] text-slate-700 min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-white border border-slate-200 shadow-sm transition-all text-sm">
+                </a>
+                <a href="{{ route('syllabus.download', '213') }}" download class="w-full bg-[#f2f7f9] text-slate-700 min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-white border border-slate-200 shadow-sm transition-all text-sm">
                     <span class="material-symbols-outlined text-lg">download</span> Download Syllabus
-                </button>
+                </a>
             </div>
         </div>
 
@@ -188,12 +188,12 @@
             </div>
             
             <div class="space-y-3 mt-auto">
-                <button class="w-full bg-rose-500 text-white min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md shadow-rose-500/20 transition-all text-sm">
+                <a href="{{ route('lessons.chapters', '202') }}" class="w-full bg-rose-500 text-white min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] shadow-md shadow-rose-500/20 transition-all text-sm">
                     Start Learning <span class="material-symbols-outlined text-lg">arrow_forward</span>
-                </button>
-                <button class="w-full bg-[#f2f7f9] text-slate-700 min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-white border border-slate-200 shadow-sm transition-all text-sm">
+                </a>
+                <a href="{{ route('syllabus.download', '202') }}" download class="w-full bg-[#f2f7f9] text-slate-700 min-h-[44px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-white border border-slate-200 shadow-sm transition-all text-sm">
                     <span class="material-symbols-outlined text-lg">download</span> Download Syllabus
-                </button>
+                </a>
             </div>
         </div>
 

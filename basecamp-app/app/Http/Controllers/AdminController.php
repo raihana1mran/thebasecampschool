@@ -16,7 +16,13 @@ class AdminController extends Controller
             ->whereHas('admissions', fn($q) => $q->where('status', 'Approved'))
             ->count();
         $pendingAdmissions = Admission::where('status', 'Pending')->count();
+        $approvedAdmissions = Admission::where('status', 'Approved')->count();
+        $rejectedAdmissions = Admission::where('status', 'Rejected')->count();
         $digitalProducts = \App\Models\Product::count();
+        $totalRevenue = \App\Models\Payment::where('status', 'Success')->sum('amount');
+        $pendingTma = \App\Models\TmaSubmission::where('status', 'submitted')->count();
+        $upcomingPcp = 0;
+        $upcomingExams = 0;
 
         $recentAdmissions = Admission::with('user')
             ->orderBy('created_at', 'desc')->take(5)->get();
@@ -31,9 +37,9 @@ class AdminController extends Controller
             ->latest()->take(10)->get();
 
         return view('admin.dashboard', compact(
-            'studentCount', 'activeStudents', 'pendingAdmissions',
-            'digitalProducts', 'recentAdmissions', 'newEnrollments',
-            'activeStudentsList'
+            'studentCount', 'activeStudents', 'pendingAdmissions', 'approvedAdmissions',
+            'rejectedAdmissions', 'digitalProducts', 'recentAdmissions', 'newEnrollments',
+            'activeStudentsList', 'totalRevenue', 'pendingTma', 'upcomingPcp', 'upcomingExams'
         ));
     }
 
@@ -310,5 +316,215 @@ class AdminController extends Controller
         ]);
 
         return redirect()->route('admin.admissions')->with('success', "Student registered successfully. Enrollment No: {$enrollmentNumber}, Temporary Password: {$temporaryPassword}");
+    }
+
+    // ========== Dashboard Action Handlers ==========
+
+    public function verifyDocument(Request $request)
+    {
+        $validated = $request->validate([
+            'admission_id' => 'required|exists:admissions,id',
+            'document'     => 'required|string',
+            'action'       => 'required|in:approve,reject',
+        ]);
+
+        $admission = Admission::findOrFail($validated['admission_id']);
+        $docs = $admission->documents ?? [];
+        $statusKey = $validated['document'] . '_status';
+        $docs[$statusKey] = $validated['action'] === 'approve' ? 'Approved' : 'Rejected';
+        $admission->documents = $docs;
+        $admission->save();
+
+        return response()->json(['success' => true, 'message' => 'Document ' . ($validated['action'] === 'approve' ? 'approved' : 'rejected') . '.']);
+    }
+
+    public function requestReupload(Request $request)
+    {
+        $validated = $request->validate([
+            'admission_id' => 'required|exists:admissions,id',
+            'documents'    => 'required|array',
+        ]);
+
+        $admission = Admission::findOrFail($validated['admission_id']);
+        $admission->status = 'Document Error';
+        $admission->save();
+
+        \App\Models\BroadcastMessage::create([
+            'audience' => $admission->email,
+            'subject'  => 'Document Re-upload Required',
+            'message'  => 'Please re-upload the following documents: ' . implode(', ', $validated['documents']),
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Re-upload requested. Student notified.']);
+    }
+
+    public function uploadTma(Request $request)
+    {
+        $validated = $request->validate([
+            'title'     => 'required|string|max:255',
+            'deadline'  => 'required|date',
+            'file'      => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+        ]);
+
+        $fileUrls = [];
+        if ($request->hasFile('file')) {
+            $path = $request->file('file')->store('tma_uploads', 'public');
+            $fileUrls[] = $path;
+        }
+
+        \App\Models\Product::create([
+            'title'      => $validated['title'],
+            'category'   => 'tma',
+            'file_urls'  => $fileUrls,
+            'price'      => 0,
+            'deadline'   => $validated['deadline'],
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'TMA assignment uploaded.']);
+    }
+
+    public function downloadInvoices(Request $request)
+    {
+        $payments = \App\Models\Payment::where('status', 'Success')->get();
+        // Generate a simple CSV of payments
+        $csv = "ID,Student,Amount,Date\n";
+        foreach ($payments as $p) {
+            $csv .= "{$p->id},{$p->user?->name},{$p->amount},{$p->created_at->format('Y-m-d')}\n";
+        }
+        return response($csv, 200, [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="invoices.csv"',
+        ]);
+    }
+
+    public function postExamNotification(Request $request)
+    {
+        $validated = $request->validate([
+            'title'   => 'required|string|max:255',
+            'message' => 'required|string',
+        ]);
+
+        \App\Models\BroadcastMessage::create([
+            'audience' => 'all',
+            'subject'  => $validated['title'],
+            'message'  => $validated['message'],
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Exam notification sent to all students.']);
+    }
+
+    public function uploadHallTicket(Request $request)
+    {
+        $validated = $request->validate([
+            'exam_name' => 'required|string|max:255',
+            'file'      => 'required|file|mimes:pdf|max:20480',
+        ]);
+
+        $path = $request->file('file')->store('hall_tickets', 'public');
+
+        \App\Models\BroadcastMessage::create([
+            'audience' => 'active',
+            'subject'  => 'Hall Ticket: ' . $validated['exam_name'],
+            'message'  => 'Hall ticket for ' . $validated['exam_name'] . ' is now available. Download from the student portal.',
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Hall ticket uploaded and students notified.']);
+    }
+
+    public function createPcpSchedule(Request $request)
+    {
+        $validated = $request->validate([
+            'title'        => 'required|string|max:255',
+            'date'         => 'required|date',
+            'study_center' => 'required|string|max:255',
+        ]);
+
+        \App\Models\BroadcastMessage::create([
+            'audience' => 'active',
+            'subject'  => 'PCP Scheduled: ' . $validated['title'],
+            'message'  => 'PCP program "' . $validated['title'] . '" scheduled on ' . $validated['date'] . ' at ' . $validated['study_center'] . '.',
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'PCP schedule created and students notified.']);
+    }
+
+    public function uploadStudyMaterial(Request $request)
+    {
+        $validated = $request->validate([
+            'title'    => 'required|string|max:255',
+            'level'    => 'required|in:secondary,senior_secondary',
+            'subject'  => 'required|string|max:255',
+            'file'     => 'required|file|mimes:pdf|max:51200',
+        ]);
+
+        $path = $request->file('file')->store('study_materials/' . $validated['level'], 'public');
+
+        \App\Models\Product::create([
+            'title'     => $validated['title'],
+            'category'  => 'pdf',
+            'price'     => 0,
+            'file_urls' => [$path],
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Study material uploaded.']);
+    }
+
+    public function publishResult(Request $request)
+    {
+        $validated = $request->validate([
+            'exam_name' => 'required|string|max:255',
+            'link'      => 'required|url',
+        ]);
+
+        \App\Models\BroadcastMessage::create([
+            'audience' => 'all',
+            'subject'  => 'Result Published: ' . $validated['exam_name'],
+            'message'  => 'Results for ' . $validated['exam_name'] . ' are now available. Check your result at: ' . $validated['link'],
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Result published and students notified.']);
+    }
+
+    public function generateEligibleList(Request $request)
+    {
+        $students = User::where('role', 'student')
+            ->whereHas('admissions', fn($q) => $q->where('status', 'Approved'))
+            ->get();
+
+        $csv = "Name,Email,Enrollment Number\n";
+        foreach ($students as $s) {
+            $csv .= "{$s->name},{$s->email},{$s->enrollment_number}\n";
+        }
+
+        return response($csv, 200, [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="eligible-students.csv"',
+        ]);
+    }
+
+    public function generateAdmissionReport(Request $request)
+    {
+        $admissions = Admission::all();
+        $csv = "ID,Name,Email,Course,Status,Date\n";
+        foreach ($admissions as $a) {
+            $csv .= "{$a->id},{$a->full_name},{$a->email},{$a->course_type},{$a->status},{$a->created_at->format('Y-m-d')}\n";
+        }
+        return response($csv, 200, [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="admission-report.csv"',
+        ]);
+    }
+
+    public function generateRevenueReport(Request $request)
+    {
+        $payments = \App\Models\Payment::with('user')->where('status', 'Success')->get();
+        $csv = "ID,Student,Amount,Type,Date\n";
+        foreach ($payments as $p) {
+            $csv .= "{$p->id},{$p->user?->name},{$p->amount},{$p->type},{$p->created_at->format('Y-m-d')}\n";
+        }
+        return response($csv, 200, [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="revenue-report.csv"',
+        ]);
     }
 }

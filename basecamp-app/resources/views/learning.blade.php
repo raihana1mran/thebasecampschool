@@ -1,19 +1,107 @@
 @php
 $tenthSubjects = [
-    ['name' => 'Hindi', 'icon' => 'language', 'category' => 'Languages'],
-    ['name' => 'Mathematics', 'icon' => 'calculate', 'category' => 'Core'],
-    ['name' => 'Science and Tech', 'icon' => 'science', 'category' => 'Core'],
-    ['name' => 'Psychology', 'icon' => 'psychology', 'category' => 'Humanities'],
-    ['name' => 'Painting', 'icon' => 'palette', 'category' => 'Arts'],
+    ['name' => 'Hindi', 'icon' => 'language', 'category' => 'Languages', 'code' => '201'],
+    ['name' => 'Mathematics', 'icon' => 'calculate', 'category' => 'Core', 'code' => '211'],
+    ['name' => 'Science and Tech', 'icon' => 'science', 'category' => 'Core', 'code' => '212'],
+    ['name' => 'Psychology', 'icon' => 'psychology', 'category' => 'Humanities', 'code' => '222'],
+    ['name' => 'Painting', 'icon' => 'palette', 'category' => 'Arts', 'code' => '225'],
 ];
 
-$twelfthScience = ['Physics', 'Chemistry', 'Biology', 'Mathematics'];
-$twelfthCommerce = ['Accountancy', 'Business Studies', 'Economics', 'Legal Studies'];
-$twelfthHumanities = ['History', 'Geography', 'Political Science', 'Mass Media'];
+$twelfthScience = [
+    ['name' => 'Physics', 'icon' => 'whatshot', 'category' => 'Science', 'code' => '312'],
+    ['name' => 'Chemistry', 'icon' => 'science', 'category' => 'Science', 'code' => '313'],
+    ['name' => 'Biology', 'icon' => 'biotech', 'category' => 'Science', 'code' => '314'],
+    ['name' => 'Mathematics', 'icon' => 'functions', 'category' => 'Science', 'code' => '311'],
+    ['name' => 'Psychology', 'icon' => 'psychology', 'category' => 'Science', 'code' => '328'],
+    ['name' => 'Environmental Science', 'icon' => 'eco', 'category' => 'Science', 'code' => '333'],
+];
+$twelfthCommerce = [
+    ['name' => 'Accountancy', 'icon' => 'account_balance', 'category' => 'Commerce', 'code' => '320'],
+    ['name' => 'Business Studies', 'icon' => 'business', 'category' => 'Commerce', 'code' => '319'],
+    ['name' => 'Economics', 'icon' => 'trending_up', 'category' => 'Commerce', 'code' => '318'],
+    ['name' => 'Legal Studies', 'icon' => 'gavel', 'category' => 'Law', 'code' => '338'],
+];
+$twelfthHumanities = [
+    ['name' => 'History', 'icon' => 'history', 'category' => 'Humanities', 'code' => '315'],
+    ['name' => 'Geography', 'icon' => 'public', 'category' => 'Humanities', 'code' => '316'],
+    ['name' => 'Political Science', 'icon' => 'how_to_vote', 'category' => 'Humanities', 'code' => '317'],
+    ['name' => 'Mass Media', 'icon' => 'campaign', 'category' => 'Humanities', 'code' => '335'],
+];
 
-$electives = ['English Core', 'Physical Education', 'Computer Science', 'Informatics Practices', 'Fine Arts', 'Hindustani Music', 'Entrepreneurship', 'Biotechnology', 'Home Science', 'Sociology', 'NCC', 'Foreign Languages'];
+$electives = [
+    ['name' => 'English Core', 'icon' => 'abc', 'category' => 'Languages', 'code' => '302'],
+    ['name' => 'Physical Education', 'icon' => 'fitness_center', 'category' => 'Sports', 'code' => '373'],
+    ['name' => 'Computer Science', 'icon' => 'computer', 'category' => 'Technology', 'code' => '330'],
+    ['name' => 'Informatics Practices', 'icon' => 'computer', 'category' => 'Technology', 'code' => null],
+    ['name' => 'Fine Arts', 'icon' => 'palette', 'category' => 'Arts', 'code' => '332'],
+    ['name' => 'Hindustani Music', 'icon' => 'music_note', 'category' => 'Performing Arts', 'code' => null],
+    ['name' => 'Entrepreneurship', 'icon' => 'rocket_launch', 'category' => 'Vocational', 'code' => '249'],
+    ['name' => 'Biotechnology', 'icon' => 'biotech', 'category' => 'Science', 'code' => null],
+    ['name' => 'Home Science', 'icon' => 'home', 'category' => 'Home Sciences', 'code' => '321'],
+    ['name' => 'Sociology', 'icon' => 'diversity_3', 'category' => 'Social Sciences', 'code' => '331'],
+    ['name' => 'NCC', 'icon' => 'military_tech', 'category' => 'Defence', 'code' => null],
+    ['name' => 'Foreign Languages', 'icon' => 'translate', 'category' => 'Languages', 'code' => null],
+    ['name' => 'Hindi', 'icon' => 'translate', 'category' => 'Languages', 'code' => '301'],
+    ['name' => 'Bengali', 'icon' => 'translate', 'category' => 'Languages', 'code' => '303'],
+    ['name' => 'Tamil', 'icon' => 'translate', 'category' => 'Languages', 'code' => '304'],
+    ['name' => 'Odia', 'icon' => 'translate', 'category' => 'Languages', 'code' => '305'],
+    ['name' => 'Urdu', 'icon' => 'translate', 'category' => 'Languages', 'code' => '306'],
+    ['name' => 'Gujarati', 'icon' => 'translate', 'category' => 'Languages', 'code' => '307'],
+    ['name' => 'Sanskrit', 'icon' => 'translate', 'category' => 'Languages', 'code' => '309'],
+    ['name' => 'Punjabi', 'icon' => 'translate', 'category' => 'Languages', 'code' => '310'],
+    ['name' => 'Arabic', 'icon' => 'translate', 'category' => 'Languages', 'code' => '341'],
+    ['name' => 'Persian', 'icon' => 'translate', 'category' => 'Languages', 'code' => '342'],
+    ['name' => 'Malayalam', 'icon' => 'translate', 'category' => 'Languages', 'code' => '343'],
+    ['name' => 'Sindhi', 'icon' => 'translate', 'category' => 'Languages', 'code' => '344'],
+    ['name' => 'Sanskrit Vyakarana', 'icon' => 'menu_book', 'category' => 'Languages', 'code' => '346'],
+    ['name' => 'Sanskrit Sahitya', 'icon' => 'menu_book', 'category' => 'Languages', 'code' => '348'],
+    ['name' => 'Tourism', 'icon' => 'flight', 'category' => 'Vocational', 'code' => '337'],
+    ['name' => 'Library & Info Science', 'icon' => 'library_books', 'category' => 'Vocational', 'code' => '339'],
+    ['name' => 'Data Entry Operations', 'icon' => 'keyboard', 'category' => 'Vocational', 'code' => '336'],
+    ['name' => 'Veda Adhyyan', 'icon' => 'auto_stories', 'category' => 'Indian Heritage', 'code' => '345'],
+    ['name' => 'Bharatiya Darshan', 'icon' => 'psychology', 'category' => 'Indian Heritage', 'code' => '347'],
+    ['name' => 'Military Studies', 'icon' => 'military_tech', 'category' => 'Defence', 'code' => '374'],
+    ['name' => 'Military History', 'icon' => 'military_tech', 'category' => 'Defence', 'code' => '375'],
+    ['name' => 'Early Childhood Care', 'icon' => 'child_care', 'category' => 'Education', 'code' => '376'],
+    ['name' => 'Krishi', 'icon' => 'agriculture', 'category' => 'Agriculture', 'code' => '383'],
+    ['name' => 'Natyakala', 'icon' => 'theater_comedy', 'category' => 'Performing Arts', 'code' => '385'],
+];
 
-$tagCloud = ['English', 'Sanskrit', 'Social Science', 'Economics', 'Business Studies', 'Accountancy', 'Veda Adhyan', 'Bharatiya Darshan', 'Sanskrit Sahitya', 'Data Entry Operations'];
+$tenthSubjectsExtra = [
+    ['name' => 'English', 'icon' => 'abc', 'category' => 'Languages', 'code' => '202'],
+    ['name' => 'Bengali', 'icon' => 'translate', 'category' => 'Languages', 'code' => '203'],
+    ['name' => 'Marathi', 'icon' => 'translate', 'category' => 'Languages', 'code' => '204'],
+    ['name' => 'Telugu', 'icon' => 'translate', 'category' => 'Languages', 'code' => '205'],
+    ['name' => 'Urdu', 'icon' => 'translate', 'category' => 'Languages', 'code' => '206'],
+    ['name' => 'Gujarati', 'icon' => 'translate', 'category' => 'Languages', 'code' => '207'],
+    ['name' => 'Kannada', 'icon' => 'translate', 'category' => 'Languages', 'code' => '208'],
+    ['name' => 'Sanskrit', 'icon' => 'translate', 'category' => 'Languages', 'code' => '209'],
+    ['name' => 'Punjabi', 'icon' => 'translate', 'category' => 'Languages', 'code' => '210'],
+    ['name' => 'Social Science', 'icon' => 'public', 'category' => 'Humanities', 'code' => '213'],
+    ['name' => 'Economics', 'icon' => 'trending_up', 'category' => 'Social Sciences', 'code' => '214'],
+    ['name' => 'Business Studies', 'icon' => 'business', 'category' => 'Commerce', 'code' => '215'],
+    ['name' => 'Home Science', 'icon' => 'home', 'category' => 'Home Sciences', 'code' => '216'],
+    ['name' => 'Accountancy', 'icon' => 'account_balance', 'category' => 'Commerce', 'code' => '224'],
+    ['name' => 'Assamese', 'icon' => 'translate', 'category' => 'Languages', 'code' => '228'],
+    ['name' => 'Data Entry Operations', 'icon' => 'keyboard', 'category' => 'Vocational', 'code' => '229'],
+    ['name' => 'Indian Sign Language', 'icon' => 'sign_language', 'category' => 'Languages', 'code' => '230'],
+    ['name' => 'Nepali', 'icon' => 'translate', 'category' => 'Languages', 'code' => '231'],
+    ['name' => 'Malayalam', 'icon' => 'translate', 'category' => 'Languages', 'code' => '232'],
+    ['name' => 'Odia', 'icon' => 'translate', 'category' => 'Languages', 'code' => '233'],
+    ['name' => 'Arabic', 'icon' => 'translate', 'category' => 'Languages', 'code' => '235'],
+    ['name' => 'Persian', 'icon' => 'translate', 'category' => 'Languages', 'code' => '236'],
+    ['name' => 'Tamil', 'icon' => 'translate', 'category' => 'Languages', 'code' => '237'],
+    ['name' => 'Sindhi', 'icon' => 'translate', 'category' => 'Languages', 'code' => '238'],
+    ['name' => 'Hindustani Sangeet', 'icon' => 'music_note', 'category' => 'Performing Arts', 'code' => '242'],
+    ['name' => 'Carnatic Sangeet', 'icon' => 'music_note', 'category' => 'Performing Arts', 'code' => '243'],
+    ['name' => 'Folk Art', 'icon' => 'theater_comedy', 'category' => 'Performing Arts', 'code' => '244'],
+    ['name' => 'Veda Adhyan', 'icon' => 'auto_stories', 'category' => 'Indian Heritage', 'code' => '245'],
+    ['name' => 'Sanskrit Vyakarana', 'icon' => 'menu_book', 'category' => 'Languages', 'code' => '246'],
+    ['name' => 'Bharatiya Darshan', 'icon' => 'psychology', 'category' => 'Indian Heritage', 'code' => '247'],
+    ['name' => 'Sanskrit Sahitya', 'icon' => 'menu_book', 'category' => 'Languages', 'code' => '248'],
+    ['name' => 'Entrepreneurship', 'icon' => 'rocket_launch', 'category' => 'Vocational', 'code' => '249'],
+    ['name' => 'Natyakala', 'icon' => 'theater_comedy', 'category' => 'Performing Arts', 'code' => '285'],
+];
 @endphp
 
 <x-student-layout>
@@ -57,7 +145,7 @@ $tagCloud = ['English', 'Sanskrit', 'Social Science', 'Economics', 'Business Stu
             <div class="w-16 sm:w-24 h-1 bg-cyan-200 rounded-full hidden sm:block"></div>
         </div>
         
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             @foreach($tenthSubjects as $subject)
             <div class="glass-card p-4 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col justify-between group shadow-sm bg-white/60">
                 <div class="mb-3 sm:mb-4">
@@ -66,14 +154,14 @@ $tagCloud = ['English', 'Sanskrit', 'Social Science', 'Economics', 'Business Stu
                 </div>
                 <span class="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-slate-400 font-bold mb-3 sm:mb-4">Category: {{ $subject['category'] }}</span>
                 <div class="space-y-2 mt-auto">
-                    <a href="{{ url('/subpage/10th-class') }}" class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 signature-gradient rounded-xl transition-all hover:scale-[1.02] shadow-md shadow-cyan-900/20 active:scale-95 min-h-[44px]">
+                    <a href="{{ route('lessons.chapters', $subject['code']) }}" class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 signature-gradient rounded-xl transition-all hover:scale-[1.02] shadow-md shadow-cyan-900/20 active:scale-95 min-h-[44px]">
                         <span class="material-symbols-outlined text-white text-base sm:text-lg">play_circle</span>
                         <span class="text-[9px] sm:text-[10px] font-bold text-white uppercase tracking-wider">Start Learning</span>
                     </a>
-                    <button class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-all group/btn shadow-sm min-h-[44px]">
+                    <a href="{{ route('syllabus.download', $subject['code']) }}" download class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-all group/btn shadow-sm min-h-[44px]">
                         <span class="material-symbols-outlined text-slate-400 text-base sm:text-lg group-hover/btn:text-[#006479]">download</span>
                         <span class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider group-hover/btn:text-[#006479]">Syllabus</span>
-                    </button>
+                    </a>
                 </div>
             </div>
             @endforeach
@@ -87,18 +175,32 @@ $tagCloud = ['English', 'Sanskrit', 'Social Science', 'Economics', 'Business Stu
             <h3 class="text-xl sm:text-3xl font-bold mb-3 sm:mb-4 text-slate-800 tracking-tight">Indian Culture & Heritage</h3>
             <p class="text-slate-500 mb-6 sm:mb-8 leading-relaxed font-medium text-sm sm:text-base">Delve into the rich tapestry of Indian civilization and its profound impact on global thought leadership.</p>
             <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                <a href="{{ url('/subpage/10th-class') }}" class="w-full sm:w-auto text-center signature-gradient text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-bold shadow-lg shadow-cyan-900/20 hover:scale-105 transition-transform text-xs sm:text-sm min-h-[44px] flex items-center justify-center">Start Learning</a>
-                <button class="w-full sm:w-auto text-center px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-bold border border-slate-200 bg-white text-slate-600 text-xs sm:text-sm hover:bg-slate-50 shadow-sm transition-all min-h-[44px]">Syllabus</button>
+                <a href="{{ route('lessons.chapters', '223') }}" class="w-full sm:w-auto text-center signature-gradient text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-bold shadow-lg shadow-cyan-900/20 hover:scale-105 transition-transform text-xs sm:text-sm min-h-[44px] flex items-center justify-center">Start Learning</a>
+                <a href="{{ route('syllabus.download', '223') }}" download class="w-full sm:w-auto text-center px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-bold border border-slate-200 bg-white text-slate-600 text-xs sm:text-sm hover:bg-slate-50 shadow-sm transition-all min-h-[44px] flex items-center justify-center">Syllabus</a>
             </div>
         </div>
 
-        <!-- Tag Cloud -->
-        <div class="mt-6 sm:mt-10">
-            <div class="flex flex-wrap gap-2 sm:gap-3">
-                @foreach($tagCloud as $tag)
-                <span class="px-3 sm:px-4 py-1.5 sm:py-2 bg-white/90 rounded-full text-[10px] sm:text-xs font-bold text-slate-600 border border-slate-200 shadow-sm hover:border-[#006479] hover:text-[#006479] transition-colors cursor-pointer select-none">{{ $tag }}</span>
-                @endforeach
+        <!-- Additional Subjects -->
+        <div class="mt-6 sm:mt-10 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            @foreach($tenthSubjectsExtra as $subject)
+            <div class="glass-card p-4 sm:p-6 rounded-xl sm:rounded-2xl flex flex-col justify-between group shadow-sm bg-white/60">
+                <div class="mb-3 sm:mb-4">
+                    <span class="material-symbols-outlined text-[#006479] mb-3 sm:mb-4 p-2 sm:p-3 bg-cyan-50 rounded-xl shadow-sm border border-cyan-100 text-lg sm:text-2xl">{{ $subject['icon'] }}</span>
+                    <h4 class="font-bold text-base sm:text-lg text-slate-800 tracking-tight">{{ $subject['name'] }}</h4>
+                </div>
+                <span class="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-slate-400 font-bold mb-3 sm:mb-4">Category: {{ $subject['category'] }}</span>
+                <div class="space-y-2 mt-auto">
+                    <a href="{{ route('lessons.chapters', $subject['code']) }}" class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 signature-gradient rounded-xl transition-all hover:scale-[1.02] shadow-md shadow-cyan-900/20 active:scale-95 min-h-[44px]">
+                        <span class="material-symbols-outlined text-white text-base sm:text-lg">play_circle</span>
+                        <span class="text-[9px] sm:text-[10px] font-bold text-white uppercase tracking-wider">Start Learning</span>
+                    </a>
+                    <a href="{{ route('syllabus.download', $subject['code']) }}" download class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-all group/btn shadow-sm min-h-[44px]">
+                        <span class="material-symbols-outlined text-slate-400 text-base sm:text-lg group-hover/btn:text-[#006479]">download</span>
+                        <span class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider group-hover/btn:text-[#006479]">Syllabus</span>
+                    </a>
+                </div>
             </div>
+            @endforeach
         </div>
     </section>
 
@@ -114,69 +216,123 @@ $tagCloud = ['English', 'Sanskrit', 'Social Science', 'Economics', 'Business Stu
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
             <!-- Science Stream -->
-            <div class="glass-panel p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-slate-200 bg-white/60 shadow-sm flex flex-col space-y-4 sm:space-y-6 hover:shadow-md transition-shadow">
-                <div class="flex items-center gap-3 sm:gap-4 mb-1 sm:mb-2 border-b border-slate-100 pb-4 sm:pb-6">
+            <div class="glass-panel p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200 bg-white/60 shadow-sm">
+                <div class="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6 border-b border-slate-100 pb-3 sm:pb-4">
                     <div class="p-2 sm:p-3 bg-cyan-50 rounded-xl sm:rounded-2xl border border-cyan-100">
                         <span class="material-symbols-outlined text-[#006479] text-2xl sm:text-3xl">biotech</span>
                     </div>
                     <h3 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Science Stream</h3>
                 </div>
-                <ul class="space-y-2 sm:space-y-3">
+                <div class="flex flex-col gap-3 sm:gap-4">
                     @foreach($twelfthScience as $sub)
-                    <li class="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl hover:bg-white border border-transparent hover:border-slate-200 hover:shadow-sm transition-all group">
-                        <span class="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-[#006479] shadow-sm shrink-0 transform group-hover:scale-125 transition-transform duration-300"></span>
-                        <span class="font-bold text-xs sm:text-sm text-slate-700 flex-1 truncate min-w-0">{{ $sub }}</span>
-                        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                            <a href="{{ url('/subpage/12th-class') }}" class="px-2.5 sm:px-3.5 py-2 sm:py-2.5 signature-gradient rounded-xl text-[9px] sm:text-[10px] font-bold text-white uppercase tracking-wider shadow-md shadow-cyan-900/10 hover:shadow-lg hover:scale-[1.02] transition-all min-h-[44px] flex items-center whitespace-nowrap">Start</a>
-                            <button class="p-2 sm:p-2.5 rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-[#006479] hover:bg-cyan-50 shadow-sm transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"><span class="material-symbols-outlined text-sm">download</span></button>
+                    <div class="glass-card p-3 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col group shadow-sm bg-white/60 border border-slate-100">
+                        <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                            <span class="material-symbols-outlined text-[#006479] p-1.5 sm:p-2 bg-cyan-50 rounded-lg border border-cyan-100 text-sm sm:text-base">{{ $sub['icon'] }}</span>
+                            <div class="min-w-0 flex-1">
+                                <h4 class="font-bold text-sm sm:text-base text-slate-800 tracking-tight truncate">{{ $sub['name'] }}</h4>
+                                <span class="text-[8px] sm:text-[9px] uppercase tracking-[0.15em] text-slate-400 font-bold">{{ $sub['category'] }}</span>
+                            </div>
                         </div>
-                    </li>
+                        <div class="space-y-2 mt-auto">
+                            <a href="{{ route('lessons.chapters', $sub['code']) }}" class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 signature-gradient rounded-xl transition-all hover:scale-[1.02] shadow-md shadow-cyan-900/10 active:scale-95 min-h-[44px]">
+                                <span class="material-symbols-outlined text-white text-base sm:text-lg">play_circle</span>
+                                <span class="text-[9px] sm:text-[10px] font-bold text-white uppercase tracking-wider">Start Learning</span>
+                            </a>
+                            @if($sub['code'])
+                            <a href="{{ route('syllabus.download', $sub['code']) }}" download class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-all group/btn shadow-sm min-h-[44px]">
+                                <span class="material-symbols-outlined text-slate-400 text-base sm:text-lg group-hover/btn:text-[#006479]">download</span>
+                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider group-hover/btn:text-[#006479]">Syllabus</span>
+                            </a>
+                            @else
+                            <button class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 bg-white border border-slate-200 rounded-xl shadow-sm min-h-[44px] opacity-50 cursor-not-allowed">
+                                <span class="material-symbols-outlined text-slate-400 text-base sm:text-lg">download</span>
+                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Syllabus</span>
+                            </button>
+                            @endif
+                        </div>
+                    </div>
                     @endforeach
-                </ul>
+                </div>
             </div>
 
             <!-- Commerce Stream -->
-            <div class="glass-panel p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-slate-200 bg-white/60 shadow-sm flex flex-col space-y-4 sm:space-y-6 hover:shadow-md transition-shadow">
-                <div class="flex items-center gap-3 sm:gap-4 mb-1 sm:mb-2 border-b border-slate-100 pb-4 sm:pb-6">
+            <div class="glass-panel p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200 bg-white/60 shadow-sm">
+                <div class="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6 border-b border-slate-100 pb-3 sm:pb-4">
                     <div class="p-2 sm:p-3 bg-amber-50 rounded-xl sm:rounded-2xl border border-amber-100">
                         <span class="material-symbols-outlined text-amber-600 text-2xl sm:text-3xl">balance</span>
                     </div>
                     <h3 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Commerce & Law</h3>
                 </div>
-                <ul class="space-y-2 sm:space-y-3">
+                <div class="flex flex-col gap-3 sm:gap-4">
                     @foreach($twelfthCommerce as $sub)
-                    <li class="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl hover:bg-white border border-transparent hover:border-slate-200 hover:shadow-sm transition-all group">
-                        <span class="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-amber-500 shadow-sm shrink-0 transform group-hover:scale-125 transition-transform duration-300"></span>
-                        <span class="font-bold text-xs sm:text-sm text-slate-700 flex-1 truncate min-w-0">{{ $sub }}</span>
-                        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                            <a href="{{ url('/subpage/12th-class') }}" class="px-2.5 sm:px-3.5 py-2 sm:py-2.5 bg-gradient-to-br from-amber-500 to-orange-400 rounded-xl text-[9px] sm:text-[10px] font-bold text-white uppercase tracking-wider shadow-md shadow-amber-500/20 hover:shadow-lg hover:scale-[1.02] transition-all min-h-[44px] flex items-center whitespace-nowrap">Start</a>
-                            <button class="p-2 sm:p-2.5 rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-amber-600 hover:bg-amber-50 shadow-sm transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"><span class="material-symbols-outlined text-sm">download</span></button>
+                    <div class="glass-card p-3 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col group shadow-sm bg-white/60 border border-slate-100">
+                        <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                            <span class="material-symbols-outlined text-amber-600 p-1.5 sm:p-2 bg-amber-50 rounded-lg border border-amber-100 text-sm sm:text-base">{{ $sub['icon'] }}</span>
+                            <div class="min-w-0 flex-1">
+                                <h4 class="font-bold text-sm sm:text-base text-slate-800 tracking-tight truncate">{{ $sub['name'] }}</h4>
+                                <span class="text-[8px] sm:text-[9px] uppercase tracking-[0.15em] text-slate-400 font-bold">{{ $sub['category'] }}</span>
+                            </div>
                         </div>
-                    </li>
+                        <div class="space-y-2 mt-auto">
+                            <a href="{{ route('lessons.chapters', $sub['code']) }}" class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 bg-gradient-to-br from-amber-500 to-orange-400 rounded-xl transition-all hover:scale-[1.02] shadow-md shadow-amber-500/20 active:scale-95 min-h-[44px]">
+                                <span class="material-symbols-outlined text-white text-base sm:text-lg">play_circle</span>
+                                <span class="text-[9px] sm:text-[10px] font-bold text-white uppercase tracking-wider">Start Learning</span>
+                            </a>
+                            @if($sub['code'])
+                            <a href="{{ route('syllabus.download', $sub['code']) }}" download class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 bg-white hover:bg-amber-50 border border-slate-200 rounded-xl transition-all group/btn shadow-sm min-h-[44px]">
+                                <span class="material-symbols-outlined text-slate-400 text-base sm:text-lg group-hover/btn:text-amber-600">download</span>
+                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider group-hover/btn:text-amber-600">Syllabus</span>
+                            </a>
+                            @else
+                            <button class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 bg-white border border-slate-200 rounded-xl shadow-sm min-h-[44px] opacity-50 cursor-not-allowed">
+                                <span class="material-symbols-outlined text-slate-400 text-base sm:text-lg">download</span>
+                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Syllabus</span>
+                            </button>
+                            @endif
+                        </div>
+                    </div>
                     @endforeach
-                </ul>
+                </div>
             </div>
 
             <!-- Humanities Stream -->
-            <div class="glass-panel p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-slate-200 bg-white/60 shadow-sm flex flex-col space-y-4 sm:space-y-6 hover:shadow-md transition-shadow">
-                <div class="flex items-center gap-3 sm:gap-4 mb-1 sm:mb-2 border-b border-slate-100 pb-4 sm:pb-6">
+            <div class="glass-panel p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200 bg-white/60 shadow-sm">
+                <div class="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6 border-b border-slate-100 pb-3 sm:pb-4">
                     <div class="p-2 sm:p-3 bg-rose-50 rounded-xl sm:rounded-2xl border border-rose-100">
                         <span class="material-symbols-outlined text-rose-600 text-2xl sm:text-3xl">theater_comedy</span>
                     </div>
                     <h3 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Humanities</h3>
                 </div>
-                <ul class="space-y-2 sm:space-y-3">
+                <div class="flex flex-col gap-3 sm:gap-4">
                     @foreach($twelfthHumanities as $sub)
-                    <li class="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl hover:bg-white border border-transparent hover:border-slate-200 hover:shadow-sm transition-all group">
-                        <span class="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-rose-500 shadow-sm shrink-0 transform group-hover:scale-125 transition-transform duration-300"></span>
-                        <span class="font-bold text-xs sm:text-sm text-slate-700 flex-1 truncate min-w-0">{{ $sub }}</span>
-                        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                            <a href="{{ url('/subpage/12th-class') }}" class="px-2.5 sm:px-3.5 py-2 sm:py-2.5 bg-gradient-to-br from-rose-500 to-pink-500 rounded-xl text-[9px] sm:text-[10px] font-bold text-white uppercase tracking-wider shadow-md shadow-rose-500/20 hover:shadow-lg hover:scale-[1.02] transition-all min-h-[44px] flex items-center whitespace-nowrap">Start</a>
-                            <button class="p-2 sm:p-2.5 rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-rose-600 hover:bg-rose-50 shadow-sm transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"><span class="material-symbols-outlined text-sm">download</span></button>
+                    <div class="glass-card p-3 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col group shadow-sm bg-white/60 border border-slate-100">
+                        <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                            <span class="material-symbols-outlined text-rose-600 p-1.5 sm:p-2 bg-rose-50 rounded-lg border border-rose-100 text-sm sm:text-base">{{ $sub['icon'] }}</span>
+                            <div class="min-w-0 flex-1">
+                                <h4 class="font-bold text-sm sm:text-base text-slate-800 tracking-tight truncate">{{ $sub['name'] }}</h4>
+                                <span class="text-[8px] sm:text-[9px] uppercase tracking-[0.15em] text-slate-400 font-bold">{{ $sub['category'] }}</span>
+                            </div>
                         </div>
-                    </li>
+                        <div class="space-y-2 mt-auto">
+                            <a href="{{ route('lessons.chapters', $sub['code']) }}" class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 bg-gradient-to-br from-rose-500 to-pink-500 rounded-xl transition-all hover:scale-[1.02] shadow-md shadow-rose-500/20 active:scale-95 min-h-[44px]">
+                                <span class="material-symbols-outlined text-white text-base sm:text-lg">play_circle</span>
+                                <span class="text-[9px] sm:text-[10px] font-bold text-white uppercase tracking-wider">Start Learning</span>
+                            </a>
+                            @if($sub['code'])
+                            <a href="{{ route('syllabus.download', $sub['code']) }}" download class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 bg-white hover:bg-rose-50 border border-slate-200 rounded-xl transition-all group/btn shadow-sm min-h-[44px]">
+                                <span class="material-symbols-outlined text-slate-400 text-base sm:text-lg group-hover/btn:text-rose-600">download</span>
+                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider group-hover/btn:text-rose-600">Syllabus</span>
+                            </a>
+                            @else
+                            <button class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 bg-white border border-slate-200 rounded-xl shadow-sm min-h-[44px] opacity-50 cursor-not-allowed">
+                                <span class="material-symbols-outlined text-slate-400 text-base sm:text-lg">download</span>
+                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Syllabus</span>
+                            </button>
+                            @endif
+                        </div>
+                    </div>
                     @endforeach
-                </ul>
+                </div>
             </div>
         </div>
 
@@ -188,13 +344,39 @@ $tagCloud = ['English', 'Sanskrit', 'Social Science', 'Economics', 'Business Stu
                 </div>
                 <span>Global Languages & Specialized Studies</span>
             </h3>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-5">
+            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 @foreach($electives as $elective)
-                <div class="p-3 sm:p-5 rounded-xl sm:rounded-2xl bg-white border border-slate-100 shadow-sm text-center hover:shadow-md hover:border-cyan-200 transition-all flex flex-col items-center gap-2 sm:gap-4 group cursor-pointer">
-                    <span class="font-bold text-[9px] sm:text-[10px] md:text-xs text-slate-700 group-hover:text-[#006479] transition-colors leading-tight truncate w-full max-w-full">{{ $elective }}</span>
-                    <div class="flex gap-1 sm:gap-2 w-full mt-auto opacity-80 group-hover:opacity-100 transition-opacity">
-                        <a href="{{ url('/subpage/12th-class') }}" class="flex-1 py-2 signature-gradient rounded-xl text-[7px] sm:text-[8px] md:text-[9px] font-bold text-white uppercase tracking-tighter hover:scale-[1.04] transition-transform min-h-[44px] flex items-center justify-center px-0.5">Start</a>
-                        <button class="p-1.5 sm:p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-400 hover:text-[#006479] hover:bg-cyan-50 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"><span class="material-symbols-outlined text-[11px] sm:text-xs">download</span></button>
+                <div class="glass-card p-3 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col group shadow-sm bg-white/60 border border-slate-100">
+                    <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                        <span class="material-symbols-outlined text-indigo-600 p-1.5 sm:p-2 bg-indigo-50 rounded-lg border border-indigo-100 text-sm sm:text-base">{{ $elective['icon'] }}</span>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm sm:text-base text-slate-800 tracking-tight truncate">{{ $elective['name'] }}</h4>
+                            <span class="text-[8px] sm:text-[9px] uppercase tracking-[0.15em] text-slate-400 font-bold">{{ $elective['category'] }}</span>
+                        </div>
+                    </div>
+                    <div class="space-y-2 mt-auto">
+                        @if($elective['code'])
+                        <a href="{{ route('lessons.chapters', $elective['code']) }}" class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 signature-gradient rounded-xl transition-all hover:scale-[1.02] shadow-md shadow-cyan-900/10 active:scale-95 min-h-[44px]">
+                            <span class="material-symbols-outlined text-white text-base sm:text-lg">play_circle</span>
+                            <span class="text-[9px] sm:text-[10px] font-bold text-white uppercase tracking-wider">Start Learning</span>
+                        </a>
+                        @else
+                        <button class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 bg-white border border-slate-200 rounded-xl shadow-sm min-h-[44px] opacity-50 cursor-not-allowed">
+                            <span class="material-symbols-outlined text-slate-400 text-base sm:text-lg">play_circle</span>
+                            <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Coming Soon</span>
+                        </button>
+                        @endif
+                        @if($elective['code'])
+                        <a href="{{ route('syllabus.download', $elective['code']) }}" download class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 bg-white hover:bg-indigo-50 border border-slate-200 rounded-xl transition-all group/btn shadow-sm min-h-[44px]">
+                            <span class="material-symbols-outlined text-slate-400 text-base sm:text-lg group-hover/btn:text-indigo-600">download</span>
+                            <span class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider group-hover/btn:text-indigo-600">Syllabus</span>
+                        </a>
+                        @else
+                        <button class="flex items-center justify-center gap-2 w-full py-3 sm:py-3 bg-white border border-slate-200 rounded-xl shadow-sm min-h-[44px] opacity-50 cursor-not-allowed">
+                            <span class="material-symbols-outlined text-slate-400 text-base sm:text-lg">download</span>
+                            <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Syllabus</span>
+                        </button>
+                        @endif
                     </div>
                 </div>
                 @endforeach

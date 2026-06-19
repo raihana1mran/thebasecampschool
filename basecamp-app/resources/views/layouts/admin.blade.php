@@ -198,7 +198,7 @@
         class="flex-grow flex flex-col bg-white border-0 lg:border lg:border-slate-200/50 shadow-sm
                m-0 lg:my-4 lg:mr-4
                rounded-none lg:rounded-[2rem]
-               overflow-hidden h-full lg:h-[calc(100vh-2rem)]"
+               h-full lg:h-[calc(100vh-2rem)]"
     >
         <!-- Top Header -->
         <header class="flex items-center justify-between w-full px-5 py-4 bg-white/80 backdrop-blur-xl border-b border-slate-100/80 shrink-0">
@@ -226,7 +226,7 @@
                         <span class="hidden lg:inline">{{ ['en'=>'English','hi'=>'हिन्दी','bn'=>'বাংলা','te'=>'తెలుగు','mr'=>'मराठी','ta'=>'தமிழ்','gu'=>'ગુજરાતી','kn'=>'കന്നಡ','ml'=>'മലയാളം','pa'=>'ਪੰਜਾਬੀ','ur'=>'اردو'][session('locale', 'en')] ?? 'English' }}</span>
                     </button>
                     <div x-show="langOpen" @click.outside="langOpen = false"
-                        class="absolute right-0 top-full mt-2 w-44 bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-200/50 z-50 py-2 max-h-64 overflow-y-auto"
+                        class="absolute left-0 top-full mt-2 w-44 bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-200/50 z-[999] py-2 max-h-[50dvh] overflow-y-auto"
                         style="display:none;">
                         @foreach(['en'=>'English','hi'=>'हिन्दी','bn'=>'বাংলা','te'=>'తెలుగు','mr'=>'मराठी','ta'=>'தமிழ்','gu'=>'ગુજરાતી','kn'=>'കന്നಡ','ml'=>'മലയാളം','pa'=>'ਪੰਜਾਬੀ','ur'=>'اردو'] as $code => $native)
                         <a href="{{ route('language.switch', $code) }}"
