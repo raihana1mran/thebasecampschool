@@ -5,14 +5,53 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Login | thebasecampschool</title>
 @vite(['resources/css/app.css', 'resources/js/app.js'])
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "tertiary-fixed": "#80b2ff","surface-bright": "#f2f7f9","on-secondary-fixed-variant": "#005f6b",
+          "tertiary-fixed-dim": "#65a4ff","surface": "#f2f7f9","primary": "#006479",
+          "outline-variant": "#a8aeb0","surface-container-lowest": "#ffffff","on-secondary": "#d8f8ff",
+          "inverse-on-surface": "#989ea0","on-primary-fixed": "#002a34","surface-container-high": "#dce4e6",
+          "tertiary": "#005bae","tertiary-container": "#80b2ff","secondary-fixed-dim": "#88d8e7",
+          "surface-dim": "#cdd6d9","surface-container-low": "#ecf2f4","surface-container-highest": "#d6dee1",
+          "surface-tint": "#006479","primary-fixed": "#40cef3","on-error": "#ffefee",
+          "on-surface-variant": "#575c5e","on-primary": "#e0f6ff","inverse-primary": "#40cef3",
+          "inverse-surface": "#0a0f11","secondary-dim": "#005863","secondary-fixed": "#96e6f6",
+          "secondary-container": "#96e6f6","on-tertiary": "#eff2ff","on-tertiary-fixed-variant": "#003971",
+          "tertiary-dim": "#004f98","error-dim": "#9f0519","primary-dim": "#00576a",
+          "surface-container": "#e3e9ec","on-tertiary-container": "#003061","on-secondary-container": "#005560",
+          "on-primary-fixed-variant": "#004a5a","on-primary-container": "#00414f","on-tertiary-fixed": "#001835",
+          "primary-container": "#40cef3","on-error-container": "#570008","primary-fixed-dim": "#28c0e4",
+          "on-surface": "#2a3031","outline": "#72787a","secondary": "#006572",
+          "error-container": "#fb5151","error": "#b31b25","on-secondary-fixed": "#004049",
+          "background": "#f2f7f9","surface-variant": "#d6dee1"
+        },
+        "borderRadius": {"DEFAULT": "0.25rem","lg": "0.5rem","xl": "1.5rem","full": "9999px"},
+        "fontFamily": {"headline": ["Space Grotesk"],"display": ["Space Grotesk"],"body": ["Space Grotesk"],"label": ["Space Grotesk"]}
+      },
+    },
+  }
+</script>
 <style>
+    body {
+        font-family: 'Space Grotesk', sans-serif;
+    }
     .material-symbols-outlined {
         font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
     .anti-gravity-shadow {
         box-shadow: 0 64px 64px -12px rgba(27, 27, 28, 0.04);
+    }
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.35);
     }
 </style>
 </head>

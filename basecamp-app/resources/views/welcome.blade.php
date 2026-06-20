@@ -277,7 +277,7 @@
           </div>
           @endforeach
         </div>
-        <a href="{{ route('register') }}" class="inline-flex items-center gap-2 signature-gradient text-white px-7 py-3.5 rounded-full font-bold text-sm shadow-lg shadow-primary/20 hover:scale-105 transition-all btn-shine">
+        <a href="{{ route('admissions.public') }}" class="inline-flex items-center gap-2 signature-gradient text-white px-7 py-3.5 rounded-full font-bold text-sm shadow-lg shadow-primary/20 hover:scale-105 transition-all btn-shine">
           <span class="material-symbols-outlined text-sm icon-pulse">payments</span> Check Fee Structure
         </a>
       </div>
