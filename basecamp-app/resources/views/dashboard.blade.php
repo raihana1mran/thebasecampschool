@@ -33,6 +33,108 @@
             $daysLeft = 0;
             $hoursLeft = 0;
         }
+
+        $classStandard = $admission ? strtolower($admission->course_type) : 'secondary';
+        
+        if ($classStandard === 'senior secondary') {
+            $subjects = [
+                ['code' => '314', 'name' => 'Biology', 'icon' => 'biotech', 'color' => 'emerald', 'desc' => 'Comprehensive study of Human Physiology, Genetics, and Evolutionary theory.', 'progress' => 52],
+                ['code' => '312', 'name' => 'Physics', 'icon' => 'electric_bolt', 'color' => 'cyan', 'desc' => 'Advanced mechanics, electromagnetism, and modern physics.', 'progress' => 35],
+                ['code' => '313', 'name' => 'Chemistry', 'icon' => 'science', 'color' => 'indigo', 'desc' => 'Deep dive into Organic reaction mechanisms, Inorganic properties, and Physical chemistry.', 'progress' => 48],
+                ['code' => '311', 'name' => 'Mathematics', 'icon' => 'functions', 'color' => 'purple', 'desc' => 'Advanced Calculus, Algebra, Vectors, and 3D Geometry.', 'progress' => 15],
+                ['code' => '302', 'name' => 'English Core', 'icon' => 'local_library', 'color' => 'amber', 'desc' => 'Senior literature studies focusing on comprehension, advanced writing, and critical analysis.', 'progress' => 70],
+                ['code' => '301', 'name' => 'Hindi', 'icon' => 'language', 'color' => 'teal', 'desc' => 'Advanced Hindi literature, language history, essays, and composition.', 'progress' => 100],
+            ];
+        } else {
+            $subjects = [
+                ['code' => '212', 'name' => 'Science & Tech', 'icon' => 'science', 'color' => 'indigo', 'desc' => 'Interactive modules for Physics, Chemistry, and Biology experiments and theory.', 'progress' => 42],
+                ['code' => '211', 'name' => 'Mathematics', 'icon' => 'functions', 'color' => 'cyan', 'desc' => 'Comprehensive coverage of Algebra, Geometry, and Trigonometry with practice sets.', 'progress' => 85],
+                ['code' => '213', 'name' => 'Social Science', 'icon' => 'public', 'color' => 'amber', 'desc' => 'Exploration of History, Geography, Political Science, and Economics.', 'progress' => 60],
+                ['code' => '202', 'name' => 'English', 'icon' => 'local_library', 'color' => 'rose', 'desc' => 'Developing advanced reading, writing, and analytical skills in English literature.', 'progress' => 25],
+                ['code' => '201', 'name' => 'Hindi', 'icon' => 'language', 'color' => 'teal', 'desc' => 'Detailed study of prose, poetry, grammar, and comprehension in Hindi.', 'progress' => 100],
+                ['code' => '229', 'name' => 'Data Entry Operations', 'icon' => 'keyboard', 'color' => 'emerald', 'desc' => 'Practical training on computer keyboarding, word processing, and spreadsheets.', 'progress' => 10],
+            ];
+        }
+
+        $colorMap = [
+            'cyan' => [
+                'border' => 'border-t-cyan-500',
+                'bg' => 'bg-cyan-50',
+                'border_inner' => 'border-cyan-100',
+                'text' => 'text-cyan-600',
+                'text_dark' => 'text-cyan-700',
+                'progress' => 'bg-cyan-500',
+                'btn' => 'bg-cyan-600 hover:bg-cyan-700 shadow-cyan-600/20',
+                'glow' => 'shadow-[0_0_8px_rgba(6,182,212,0.4)]',
+                'hover_syllabus' => 'hover:bg-cyan-50 group-hover/btn:text-cyan-600'
+            ],
+            'emerald' => [
+                'border' => 'border-t-emerald-500',
+                'bg' => 'bg-emerald-50',
+                'border_inner' => 'border-emerald-100',
+                'text' => 'text-emerald-600',
+                'text_dark' => 'text-emerald-700',
+                'progress' => 'bg-emerald-500',
+                'btn' => 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20',
+                'glow' => 'shadow-[0_0_8px_rgba(16,185,129,0.4)]',
+                'hover_syllabus' => 'hover:bg-emerald-50 group-hover/btn:text-emerald-600'
+            ],
+            'indigo' => [
+                'border' => 'border-t-indigo-500',
+                'bg' => 'bg-indigo-50',
+                'border_inner' => 'border-indigo-100',
+                'text' => 'text-indigo-600',
+                'text_dark' => 'text-indigo-700',
+                'progress' => 'bg-indigo-500',
+                'btn' => 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-600/20',
+                'glow' => 'shadow-[0_0_8px_rgba(99,102,241,0.4)]',
+                'hover_syllabus' => 'hover:bg-indigo-50 group-hover/btn:text-indigo-600'
+            ],
+            'purple' => [
+                'border' => 'border-t-purple-500',
+                'bg' => 'bg-purple-50',
+                'border_inner' => 'border-purple-100',
+                'text' => 'text-purple-600',
+                'text_dark' => 'text-purple-700',
+                'progress' => 'bg-purple-500',
+                'btn' => 'bg-purple-600 hover:bg-purple-700 shadow-purple-600/20',
+                'glow' => 'shadow-[0_0_8px_rgba(168,85,247,0.4)]',
+                'hover_syllabus' => 'hover:bg-purple-50 group-hover/btn:text-purple-600'
+            ],
+            'amber' => [
+                'border' => 'border-t-amber-500',
+                'bg' => 'bg-amber-50',
+                'border_inner' => 'border-amber-100',
+                'text' => 'text-amber-600',
+                'text_dark' => 'text-amber-700',
+                'progress' => 'bg-amber-500',
+                'btn' => 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/20',
+                'glow' => 'shadow-[0_0_8px_rgba(245,158,11,0.4)]',
+                'hover_syllabus' => 'hover:bg-amber-50 group-hover/btn:text-amber-600'
+            ],
+            'rose' => [
+                'border' => 'border-t-rose-500',
+                'bg' => 'bg-rose-50',
+                'border_inner' => 'border-rose-100',
+                'text' => 'text-rose-600',
+                'text_dark' => 'text-rose-700',
+                'progress' => 'bg-rose-500',
+                'btn' => 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/20',
+                'glow' => 'shadow-[0_0_8px_rgba(244,63,94,0.4)]',
+                'hover_syllabus' => 'hover:bg-rose-50 group-hover/btn:text-rose-600'
+            ],
+            'teal' => [
+                'border' => 'border-t-teal-500',
+                'bg' => 'bg-teal-50',
+                'border_inner' => 'border-teal-100',
+                'text' => 'text-teal-600',
+                'text_dark' => 'text-teal-700',
+                'progress' => 'bg-teal-500',
+                'btn' => 'bg-teal-600 hover:bg-teal-700 shadow-teal-600/20',
+                'glow' => 'shadow-[0_0_8px_rgba(20,184,166,0.4)]',
+                'hover_syllabus' => 'hover:bg-teal-50 group-hover/btn:text-teal-600'
+            ],
+        ];
     @endphp
 
     <style>
@@ -243,7 +345,30 @@
                             <h4 class="font-bold text-slate-800 text-xs sm:text-sm">{{ $broadcast->subject }}</h4>
                             <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ $broadcast->created_at->diffForHumans() }}</span>
                         </div>
-                        <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed break-words">{!! preg_replace('/\b(https?:\/\/[^\s<]+)/', '<a href="$1" target="_blank" class="text-cyan-600 font-bold hover:underline">$1</a>', e($broadcast->message)) !!}</p>
+                        @if(str_starts_with($broadcast->message, '[Audio Broadcast'))
+                            @php
+                                preg_match('/\[Audio Broadcast - (.*?)\] (.*)/', $broadcast->message, $matches);
+                                $lang = $matches[1] ?? 'Audio';
+                                $audioUrl = isset($matches[2]) ? asset('storage/' . $matches[2]) : '';
+                            @endphp
+                            <div class="mt-2 bg-slate-50/50 p-3 rounded-xl border border-slate-200/60 flex flex-col gap-2">
+                                <div class="flex items-center gap-1.5 text-[10px] font-bold text-primary uppercase tracking-widest">
+                                    <span class="material-symbols-outlined text-sm">volume_up</span>
+                                    <span>{{ $lang }} Audio Message</span>
+                                </div>
+                                @if($audioUrl)
+                                <audio controls class="w-full h-9 rounded-full outline-none">
+                                    <source src="{{ $audioUrl }}" type="audio/mpeg">
+                                    <source src="{{ $audioUrl }}" type="audio/wav">
+                                    Your browser does not support the audio element.
+                                </audio>
+                                @else
+                                <p class="text-xs text-red-500 font-medium">Audio file unavailable.</p>
+                                @endif
+                            </div>
+                        @else
+                            <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed break-words">{!! preg_replace('/\b(https?:\/\/[^\s<]+)/', '<a href="$1" target="_blank" class="text-cyan-600 font-bold hover:underline">$1</a>', e($broadcast->message)) !!}</p>
+                        @endif
                     </div>
                 @endforeach
             </div>
@@ -267,6 +392,82 @@
                 <span class="material-symbols-outlined text-lg">refresh</span>
                 <span class="hidden sm:inline">Reset</span>
             </button>
+        </div>
+    </div>
+
+    <!-- Course Subjects Section -->
+    <div class="mb-6 sm:mb-8 relative z-10 glass-panel p-4 sm:p-8 rounded-2xl sm:rounded-3xl shadow-sm border border-white/60">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 sm:mb-8">
+            <div>
+                <h2 class="text-lg sm:text-2xl font-bold tracking-tight text-slate-800 mb-0.5 sm:mb-1">My Course Subjects</h2>
+                <p class="text-[11px] sm:text-sm font-medium text-slate-500">Class-wise standard curriculum learning modules & downloadable syllabus</p>
+            </div>
+            <a href="{{ route('learning') }}" class="px-4 py-2.5 border border-slate-200 hover:border-cyan-600 hover:text-cyan-600 rounded-xl text-xs font-bold transition-all bg-white/80 shadow-sm flex items-center justify-center gap-1.5 min-h-[44px]">
+                <span class="material-symbols-outlined text-sm">open_in_new</span>
+                Curriculum Hub
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            @foreach($subjects as $sub)
+                @php
+                    $colors = $colorMap[$sub['color']] ?? $colorMap['cyan'];
+                @endphp
+                <div x-show="!searchQuery || '{{ $sub['name'] }}'.toLowerCase().includes(searchQuery.toLowerCase())" class="group bg-white rounded-2xl p-5 border border-slate-100 {{ $colors['border'] }} border-t-4 hover:shadow-xl hover:shadow-cyan-900/5 transition-all duration-300 relative overflow-hidden flex flex-col">
+                    <div class="absolute inset-0 bg-gradient-to-br from-slate-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="relative z-10 flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded-xl {{ $colors['bg'] }} flex items-center justify-center {{ $colors['text'] }} shadow-sm border {{ $colors['border_inner'] }}">
+                                <span class="material-symbols-outlined text-2xl">{{ $sub['icon'] }}</span>
+                            </div>
+                            <span class="{{ $colors['bg'] }} {{ $colors['text_dark'] }} text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest border {{ $colors['border_inner'] }}">{{ $sub['code'] }}</span>
+                        </div>
+                        <h3 class="font-bold text-slate-800 text-base mb-1">{{ $sub['name'] }}</h3>
+                        <p class="text-xs text-slate-500 mb-4 flex-1 leading-relaxed font-medium">{{ $sub['desc'] }}</p>
+
+                        <!-- Progress Bar -->
+                        <div class="mb-5">
+                            <div class="flex justify-between items-center mb-1.5">
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Progress</span>
+                                <span class="text-[9px] font-bold {{ $colors['text'] }}">{{ $sub['progress'] }}%</span>
+                            </div>
+                            <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                                <div class="h-full {{ $colors['progress'] }} {{ $colors['glow'] }} rounded-full" style="width: {{ $sub['progress'] }}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2 mt-auto">
+                            <a href="{{ route('lessons.chapters', $sub['code']) }}" class="w-full flex items-center justify-center gap-2 bg-slate-900 text-white hover:{{ $colors['btn'] }} px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-slate-900/20 hover:scale-[1.02] min-h-[44px]">
+                                <span class="material-symbols-outlined text-[18px]">play_circle</span>
+                                Start Learning
+                            </a>
+                            <div class="grid grid-cols-2 gap-2">
+                                <a href="{{ route('syllabus.download', $sub['code']) }}" download class="flex items-center justify-center gap-1 w-full py-2.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl transition-all group/btn shadow-sm min-h-[40px] text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                    <span class="material-symbols-outlined text-slate-400 text-sm group-hover/btn:{{ $colors['text'] }}">download</span>
+                                    Syllabus
+                                </a>
+                                @php
+                                    $matchingVideo = $videoLessons ? $videoLessons->first(function($vl) use ($sub) {
+                                        return str_contains(strtolower($vl->subject), strtolower($sub['name'])) ||
+                                               str_contains(strtolower($vl->subject), $sub['code']);
+                                    }) : null;
+                                @endphp
+                                @if($matchingVideo)
+                                <a href="{{ route('learning.video', $matchingVideo->id) }}" class="flex items-center justify-center gap-1 w-full py-2.5 {{ $colors['bg'] }} {{ $colors['hover_syllabus'] }} border {{ $colors['border_inner'] }} {{ $colors['text_dark'] }} rounded-xl transition-all shadow-sm min-h-[40px] text-[10px] font-bold uppercase tracking-wider">
+                                    <span class="material-symbols-outlined text-sm">smart_display</span>
+                                    Playlists
+                                </a>
+                                @else
+                                <button class="flex items-center justify-center gap-1 w-full py-2.5 bg-slate-50 border border-slate-200 text-slate-300 rounded-xl min-h-[40px] text-[10px] font-bold uppercase tracking-wider opacity-60 cursor-not-allowed" disabled>
+                                    <span class="material-symbols-outlined text-slate-300 text-sm">smart_display</span>
+                                    Videos
+                                </button>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
         </div>
     </div>
 

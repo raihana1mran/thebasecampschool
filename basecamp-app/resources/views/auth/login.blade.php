@@ -42,7 +42,7 @@
 <!-- Email Input -->
 <div class="group border-b border-outline-variant focus-within:border-primary transition-all duration-300">
 <label class="block font-label text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-1 md:mb-2" for="enrollment_number">Enrollment Number</label>
-<input class="w-full bg-transparent border-none px-0 py-2 md:py-4 focus:ring-0 text-primary placeholder:text-outline-variant/50 text-base md:text-lg transition-all" id="enrollment_number" name="enrollment_number" value="{{ old('enrollment_number') }}" placeholder="TBC-2026-ABCDEF" required="" type="text" autofocus autocomplete="username"/>
+<input class="w-full bg-transparent border-none px-0 py-2 md:py-4 focus:ring-0 text-primary placeholder:text-outline-variant/50 text-base md:text-lg transition-all" id="enrollment_number" name="enrollment_number" value="{{ old('enrollment_number') }}" placeholder="123456789" required="" type="text" autofocus autocomplete="username"/>
 <x-input-error :messages="$errors->get('enrollment_number')" class="mt-2" />
 </div>
 <!-- Password Input -->

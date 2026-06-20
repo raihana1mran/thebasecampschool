@@ -140,26 +140,21 @@
             </div>
         </div>
 
-        {{-- Enrollment Number Card --}}
+        {{-- Enrollment Number (Pending) --}}
         <div class="slide-up-3 bg-surface-container-lowest rounded-3xl p-6 mb-4 border border-outline-variant/20 shadow-lg">
             <div class="flex items-center gap-3 mb-3">
                 <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                    <span class="material-symbols-outlined text-primary text-xl">badge</span>
+                    <span class="material-symbols-outlined text-primary text-xl">hourglass_empty</span>
                 </div>
                 <div>
                     <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Your Enrollment Number</p>
-                    <p class="text-xs text-on-surface-variant/70 font-medium">Use this to log in to your student portal</p>
+                    <p class="text-xs text-on-surface-variant/70 font-medium">To be assigned upon admission approval</p>
                 </div>
             </div>
             <div class="flex items-center justify-between bg-surface rounded-xl px-4 py-3 border border-outline-variant/30 gap-2">
-                <span class="font-headline font-bold text-primary text-lg tracking-wider" id="enroll-number-text">
-                    {{ session('enrollment_number', 'TBC-XXXXXX') }}
+                <span class="font-headline font-bold text-on-surface-variant/50 text-sm tracking-wider uppercase">
+                    Pending Admin Approval
                 </span>
-                <button onclick="copyText('enroll-number-text','copy-enroll-icon')"
-                    class="flex items-center gap-1 text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold transition-all duration-200 active:scale-95 flex-shrink-0">
-                    <span class="material-symbols-outlined text-base" id="copy-enroll-icon">content_copy</span>
-                    Copy
-                </button>
             </div>
         </div>
 

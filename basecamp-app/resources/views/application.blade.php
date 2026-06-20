@@ -302,7 +302,13 @@
         addressProofName: '',
         marksheetName: '',
         categoryCertName: '',
-        
+
+        country: '',
+        studyCentreState: '',
+        studyCentreDistrict: '',
+        studyCentre: '',
+        studyMedium: '',
+
         declarationChecked: false,
         selectedSubjects: [],
         get availableCoreSubjects() {
@@ -461,7 +467,7 @@
             };
         },
         validateStep3() {
-            return this.prevClass && this.prevBoard && this.prevYear && this.prevRoll && this.subjectValidation.isValid && this.country && this.studyCentreState && this.studyCentreDistrict && this.studyCentre;
+            return this.prevClass && this.prevBoard && this.prevYear && this.prevRoll && this.subjectValidation.isValid && this.country && this.studyCentreState && this.studyCentreDistrict && this.studyCentre && this.studyMedium;
         },
 
         goToStep(step) {
@@ -477,7 +483,7 @@
             }
             if (step > 3 && !this.validateStep3()) {
                 this.showStep3Errors = true;
-                alert('Please fill in all academic details, select subjects, and choose a study center in Step 3 first.');
+                alert('Please fill in all academic details, select subjects, choose a study center, and select the medium of study in Step 3 first.');
                 this.activeStep = 3;
                 return;
             }
@@ -876,6 +882,24 @@
                                 </div>
                                 @error('previousQualification') <p class="text-xs text-error font-bold mt-1">{{ $message }}</p> @enderror
 
+                                <!-- Medium of Study -->
+                                <div class="space-y-2 pt-6 border-t border-outline-variant/10">
+                                    <label class="text-sm font-bold uppercase tracking-wider text-on-surface-variant block">Medium of Study <span class="text-red-500">*</span></label>
+                                    <div class="relative w-full md:w-1/2">
+                                        <select name="studyMedium" x-model="studyMedium" class="w-full bg-white border border-outline-variant/20 rounded-xl p-3.5 text-sm font-semibold text-on-surface focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer outline-none transition-all">
+                                            <option value="" disabled selected>Select Medium of Instruction</option>
+                                            <option value="English">English</option>
+                                            <option value="Hindi">Hindi</option>
+                                            <option value="Urdu">Urdu</option>
+                                            <option value="Regional">Regional Language</option>
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-on-surface-variant">
+                                            <span class="material-symbols-outlined text-lg">expand_more</span>
+                                        </div>
+                                    </div>
+                                    @error('studyMedium') <p class="text-xs text-error font-bold mt-1">{{ $message }}</p> @enderror
+                                </div>
+
                                 <div class="space-y-4 pt-4 border-t border-outline-variant/10">
                                     <div class="flex justify-between items-baseline">
                                         <label class="text-sm font-bold uppercase tracking-wider text-on-surface-variant block">Subject Combination Selection (5 to 7 Subjects) <span class="text-red-500">*</span></label>
@@ -921,6 +945,8 @@
                                                 </label>
                                             </template>
                                         </div>
+                                    </div>
+                                    
                                     </div>
                                     
                                     <!-- Hidden Inputs to bind dynamic subject selection for backend submission -->

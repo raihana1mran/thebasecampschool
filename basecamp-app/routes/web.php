@@ -140,8 +140,10 @@ Route::get('/dashboard', function () {
         });
     })->latest()->get();
     
+    $videoLessons = \App\Models\VideoLesson::all();
+    
     // Show student dashboard directly
-    return view('dashboard', compact('tmaCount', 'resourceCount', 'mockTestCount', 'tmas', 'resources', 'allResources', 'allResourceCount', 'broadcasts', 'unlockedProducts'));
+    return view('dashboard', compact('tmaCount', 'resourceCount', 'mockTestCount', 'tmas', 'resources', 'allResources', 'allResourceCount', 'broadcasts', 'unlockedProducts', 'videoLessons'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/subpage/{slug}', function ($slug) {
@@ -151,6 +153,11 @@ Route::get('/subpage/{slug}', function ($slug) {
     // Universal intercept: load the immersive learning path view for all subjects
     return view('subpages.12th-biology');
 })->middleware(['auth', 'verified'])->name('subpage');
+
+Route::get('/learning/{id}', function($id) {
+    $lesson = \App\Models\VideoLesson::findOrFail($id);
+    return view('learning', compact('lesson'));
+})->middleware(['auth', 'verified'])->name('learning.video');
 
 use App\Http\Controllers\MockTestController;
 use App\Http\Controllers\ProductController;
@@ -168,9 +175,20 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::get('/mocktests', [AdminController::class, 'mocktestsView'])->name('admin.mocktests');
     Route::post('/mocktests', [MockTestController::class, 'createMockTest']);
     Route::delete('/mocktests/{id}', [MockTestController::class, 'deleteMockTest']);
+    Route::get('/exams', [AdminController::class, 'examsView'])->name('admin.exams');
+    Route::get('/pcp', [AdminController::class, 'pcpView'])->name('admin.pcp');
+    Route::get('/tma', [AdminController::class, 'tmaView'])->name('admin.tma');
+    Route::get('/study-material', [AdminController::class, 'studyMaterialView'])->name('admin.study_material');
+    Route::get('/results', [AdminController::class, 'resultsView'])->name('admin.results');
+    Route::get('/notifications', [AdminController::class, 'notificationsView'])->name('admin.notifications');
+    Route::get('/reports', [AdminController::class, 'reportsView'])->name('admin.reports');
     Route::get('/payments', [AdminController::class, 'paymentsView'])->name('admin.payments');
     Route::get('/referrals', [AdminController::class, 'referralsView'])->name('admin.referrals');
     Route::get('/settings', [AdminController::class, 'settingsView'])->name('admin.settings');
+    Route::get('/video-lessons', [AdminController::class, 'videoLessonsView'])->name('admin.video-lessons');
+    Route::post('/video-lessons/upload', [AdminController::class, 'uploadVideoLesson'])->name('admin.video-lessons.upload');
+    Route::delete('/video-lessons/{id}', [AdminController::class, 'deleteVideoLesson'])->name('admin.video-lessons.delete');
+    Route::delete('/broadcasts/{id}', [AdminController::class, 'deleteBroadcast'])->name('admin.broadcasts.delete');
     Route::post('/message', [AdminController::class, 'message'])->name('admin.message');
     Route::put('/admissions/{id}/status', [App\Http\Controllers\AdmissionController::class, 'updateAdmissionStatus'])->name('admin.admissions.status');
     Route::patch('/students/{id}/enrollment', [AdminController::class, 'updateEnrollmentNumber'])->name('admin.students.enrollment');
@@ -243,6 +261,18 @@ Route::middleware('auth')->group(function () {
     
     Route::post('/products/{id}/unlock', [ProductController::class, 'unlockProduct'])->name('products.unlock');
 
+    Route::post('/payments/tma-late-fee/{productId}', function ($productId) {
+        $user = auth()->user();
+        \App\Models\Payment::create([
+            'user_id' => $user->id,
+            'amount' => 1200.00,
+            'payment_id' => 'tma_late_' . $productId . '_' . strtoupper(\Illuminate\Support\Str::random(8)),
+            'status' => 'Success',
+            'type' => 'TMA',
+        ]);
+        return redirect()->back()->with('success', 'TMA late fee paid successfully! You can now submit your assignment.');
+    })->name('payments.tma-late-fee');
+
     Route::get('/tma', function () {
         $tmas = \App\Models\Product::where('category', 'tma')->latest()->get();
         $mySubmissions = \App\Models\TmaSubmission::where('user_id', auth()->id())
@@ -306,7 +336,18 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/learning', function () {
-    return view('learning');
+    $videoLessons = collect();
+    $admission = \App\Models\Admission::where('user_id', auth()->id())->first();
+    $classStandard = 'Secondary (10th)';
+    if ($admission) {
+        $classStandard = match(strtolower($admission->course_type)) {
+            'secondary' => 'Secondary (10th)',
+            'senior secondary' => 'Senior Secondary (12th)',
+            default => 'Secondary (10th)'
+        };
+        $videoLessons = \App\Models\VideoLesson::where('class_level', $classStandard)->get();
+    }
+    return view('learning-hub', compact('videoLessons', 'admission', 'classStandard'));
 })->name('learning');
 
 Route::get('/lessons/{code}', function ($code) {
@@ -345,11 +386,16 @@ Route::get('/lessons/{code}', function ($code) {
 
     $chapters = [];
     for ($i = 1; $i <= 12; $i++) {
+        $embedUrl = "https://www.youtube.com/embed/PLACEHOLDER_{$code}_CH{$i}";
+        if ($code === '314') {
+            $index = $i - 1;
+            $embedUrl = "https://www.youtube.com/embed/videoseries?list=PLJtCpape_TuiytvOVnvffWeWFSimU5aiT&index={$index}";
+        }
         $chapters[] = [
             'number' => $i,
             'title' => "Chapter {$i}",
             'description' => "Video lesson covering Chapter {$i} concepts and topics.",
-            'embed_url' => "https://www.youtube.com/embed/PLACEHOLDER_{$code}_CH{$i}",
+            'embed_url' => $embedUrl,
         ];
     }
 

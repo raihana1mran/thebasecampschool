@@ -122,6 +122,53 @@ class AdminController extends Controller
         return view('admin.mocktests', compact('mockTests'));
     }
 
+    public function videoLessonsView()
+    {
+        $videoLessons = \App\Models\VideoLesson::latest()->get()->map(function ($lesson) {
+            return [
+                'id' => $lesson->id,
+                'class' => $lesson->class_level,
+                'subject' => $lesson->subject,
+                'playlist_url' => $lesson->playlist_url,
+                'uploaded_at' => $lesson->created_at,
+            ];
+        });
+        return view('admin.video-lessons', compact('videoLessons'));
+    }
+
+    public function uploadVideoLesson(Request $request)
+    {
+        $request->validate([
+            'subject' => 'required|string|max:255',
+            'class_level' => 'required|string|max:255',
+            'playlist_url' => 'required|url|max:255',
+        ]);
+
+        \App\Models\VideoLesson::create([
+            'subject' => $request->subject,
+            'class_level' => $request->class_level,
+            'playlist_url' => $request->playlist_url,
+        ]);
+
+        return back()->with('success', 'Video lesson playlist link has been saved successfully.');
+    }
+
+    public function deleteVideoLesson($id)
+    {
+        $lesson = \App\Models\VideoLesson::findOrFail($id);
+        $lesson->delete();
+
+        return response()->json(['success' => true, 'message' => 'Video lesson deleted successfully.']);
+    }
+
+    public function deleteBroadcast($id)
+    {
+        $message = \App\Models\BroadcastMessage::findOrFail($id);
+        $message->delete();
+
+        return response()->json(['success' => true, 'message' => 'Broadcast message deleted successfully.']);
+    }
+
     public function settingsView()
     {
         return view('admin.settings');
@@ -144,14 +191,24 @@ class AdminController extends Controller
     {
         $validated = $request->validate([
             'subject' => 'required|string',
-            'message' => 'required|string',
+            'message' => 'nullable|string',
             'audience' => 'required|string',
+            'audioLanguage' => 'nullable|string',
+            'audioFile' => 'nullable|file|mimes:mp3,wav|max:10240',
         ]);
+
+        $messageContent = $validated['message'] ?? '';
+
+        if ($request->hasFile('audioFile')) {
+            $audioPath = $request->file('audioFile')->store('broadcast_audio', 'public');
+            $lang = $validated['audioLanguage'] ?? 'Unknown';
+            $messageContent = "[Audio Broadcast - {$lang}] " . $audioPath;
+        }
 
         \App\Models\BroadcastMessage::create([
             'audience' => $validated['audience'],
             'subject' => $validated['subject'],
-            'message' => $validated['message'],
+            'message' => $messageContent ?: 'Empty Message',
         ]);
 
         return response()->json([
@@ -201,6 +258,38 @@ class AdminController extends Controller
         $totalRevenue = \App\Models\Payment::where('status', 'Success')->sum('amount');
         $paymentsCount = \App\Models\Payment::count();
         return view('admin.payments', compact('payments', 'totalRevenue', 'paymentsCount'));
+    }
+
+    public function examsView()
+    {
+        $notifications = \App\Models\BroadcastMessage::latest()->take(10)->get();
+        $admissions = \App\Models\Admission::with('user')->where('status', 'Approved')->latest()->get();
+        return view('admin.exams', compact('notifications', 'admissions'));
+    }
+
+    public function pcpView()
+    {
+        $notifications = \App\Models\BroadcastMessage::latest()->take(10)->get();
+        $admissions = \App\Models\Admission::with('user')->where('status', 'Approved')->latest()->get();
+        return view('admin.pcp', compact('notifications', 'admissions'));
+    }
+
+    public function tmaView()
+    {
+        $submissions = \App\Models\TmaSubmission::with(['user', 'product'])->latest()->get();
+        $groupedSubmissions = $submissions->groupBy('user_id');
+        $tmas = \App\Models\Product::where('category', 'tma')->latest()->get();
+        $pendingCount = \App\Models\TmaSubmission::where('status', 'submitted')->count();
+        $averageScore = \App\Models\TmaSubmission::where('status', 'graded')->avg('tma_marks') ?? 0;
+        $totalSubmissions = \App\Models\TmaSubmission::count();
+        
+        return view('admin.tma', compact('submissions', 'groupedSubmissions', 'tmas', 'pendingCount', 'averageScore', 'totalSubmissions'));
+    }
+
+    public function studyMaterialView()
+    {
+        $materials = \App\Models\Product::where('category', 'pdf')->latest()->get();
+        return view('admin.study_material', compact('materials'));
     }
 
     public function referralsView()
@@ -451,22 +540,104 @@ class AdminController extends Controller
     public function uploadStudyMaterial(Request $request)
     {
         $validated = $request->validate([
-            'title'    => 'required|string|max:255',
-            'level'    => 'required|in:secondary,senior_secondary',
-            'subject'  => 'required|string|max:255',
-            'file'     => 'required|file|mimes:pdf|max:51200',
+            'title'        => 'required|string|max:255',
+            'level'        => 'required|in:secondary,senior_secondary',
+            'subject'      => 'required|string|max:255',
+            'materialType' => 'required|string|max:255',
+            'file'         => 'required|file|mimes:pdf,doc,docx|max:51200',
         ]);
 
         $path = $request->file('file')->store('study_materials/' . $validated['level'], 'public');
 
         \App\Models\Product::create([
-            'title'     => $validated['title'],
-            'category'  => 'pdf',
-            'price'     => 0,
-            'file_urls' => [$path],
+            'title'       => $validated['title'],
+            'category'    => 'pdf',
+            'description' => $validated['materialType'],
+            'price'       => 0,
+            'file_urls'   => [$path],
         ]);
 
         return response()->json(['success' => true, 'message' => 'Study material uploaded.']);
+    }
+
+    public function reportsView()
+    {
+        // KPI figures
+        $totalStudents     = User::where('role', 'student')->count();
+        $totalRevenue      = \App\Models\Payment::where('status', 'Success')->sum('amount');
+        $pendingAdmissions = \App\Models\Admission::where('status', 'Pending')->count();
+        $totalAdmissions   = \App\Models\Admission::count();
+
+        // TMA stats
+        $totalTma   = \App\Models\TmaSubmission::count();
+        $gradedTma  = \App\Models\TmaSubmission::where('status', 'graded')->count();
+        $pendingTma = \App\Models\TmaSubmission::where('status', 'submitted')->count();
+        $tmaCompletionRate = $totalTma > 0 ? round(($gradedTma / $totalTma) * 100) : 0;
+
+        // Student lifecycle
+        $activeStudents   = User::where('role', 'student')->whereNotNull('first_login_at')->count();
+        $approvedStudents = \App\Models\Admission::where('status', 'Approved')->count();
+        $rejectedStudents = \App\Models\Admission::where('status', 'Rejected')->count();
+        $pendingStudents  = \App\Models\Admission::where('status', 'Pending')->count();
+
+        // Monthly admissions — last 12 months
+        $months = collect(range(11, 0))->map(fn($i) => now()->subMonths($i));
+        $admissionMonths = $months->map(fn($m) => $m->format('M'))->values()->toArray();
+        $admissionCounts = $months->map(function ($m) {
+            return \App\Models\Admission::whereYear('created_at', $m->year)
+                ->whereMonth('created_at', $m->month)->count();
+        })->values()->toArray();
+
+        // Revenue by payment type
+        $revenueByType = \App\Models\Payment::where('status', 'Success')
+            ->selectRaw('type, SUM(amount) as total')
+            ->groupBy('type')->get();
+        $revenueLabels  = $revenueByType->pluck('type')->toArray();
+        $revenueAmounts = $revenueByType->pluck('total')->map(fn($v) => round($v))->toArray();
+
+        return view('admin.reports', compact(
+            'totalStudents', 'totalRevenue', 'pendingAdmissions', 'totalAdmissions',
+            'totalTma', 'gradedTma', 'pendingTma', 'tmaCompletionRate',
+            'activeStudents', 'approvedStudents', 'rejectedStudents', 'pendingStudents',
+            'admissionMonths', 'admissionCounts',
+            'revenueLabels', 'revenueAmounts'
+        ));
+    }
+
+    public function notificationsView()
+    {
+        $recentMessages = \App\Models\BroadcastMessage::latest()->take(10)->get();
+        $totalSent = \App\Models\BroadcastMessage::count();
+        $totalStudents = User::where('role', 'student')->count();
+        $deliveryRate = 98; // Static indicator; can be made dynamic with a delivery log table
+        $scheduledCount = 0; // Placeholder for future scheduling feature
+
+        return view('admin.notifications', compact(
+            'recentMessages', 'totalSent', 'totalStudents', 'deliveryRate', 'scheduledCount'
+        ));
+    }
+
+    public function resultsView()
+    {
+        $students = User::where('role', 'student')
+            ->with(['admissions', 'tmaSubmissions'])
+            ->latest()->get();
+
+        $totalStudents = $students->count();
+
+        $passCount = $students->filter(function ($s) {
+            $avg = $s->tmaSubmissions->whereNotNull('tma_marks')->avg('tma_marks');
+            return $avg !== null && $avg >= 33;
+        })->count();
+
+        $failCount = $students->filter(function ($s) {
+            $avg = $s->tmaSubmissions->whereNotNull('tma_marks')->avg('tma_marks');
+            return $avg !== null && $avg < 33;
+        })->count();
+
+        $avgScore = \App\Models\TmaSubmission::whereNotNull('tma_marks')->avg('tma_marks') ?? 0;
+
+        return view('admin.results', compact('students', 'totalStudents', 'passCount', 'failCount', 'avgScore'));
     }
 
     public function publishResult(Request $request)

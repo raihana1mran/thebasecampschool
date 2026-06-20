@@ -17,6 +17,20 @@ class TmaController extends Controller
         ]);
 
         $user = auth()->user();
+        $tma = \App\Models\Product::findOrFail($productId);
+
+        // Check if deadline has crossed
+        $deadlinePassed = $tma->deadline && \Carbon\Carbon::parse($tma->deadline)->isPast();
+        if ($deadlinePassed) {
+            $hasPaid = \App\Models\Payment::where('user_id', $user->id)
+                ->where('type', 'TMA')
+                ->where('payment_id', 'like', 'tma_late_' . $productId . '%')
+                ->where('status', 'Success')
+                ->exists();
+            if (!$hasPaid) {
+                return redirect()->back()->with('error', 'The submission deadline has passed. You must pay the late fee of ₹1,200 before submitting.');
+            }
+        }
 
         $file = $request->file('tma_file');
         $originalName = $file->getClientOriginalName();

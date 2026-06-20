@@ -92,128 +92,7 @@
         [x-cloak] { display: none !important; }
     </style>
 
-    <div x-data="{
-        isMessageModalOpen: false,
-        isAddStudentModalOpen: false,
-        isStatusModalOpen: false,
-        isProfileDrawerOpen: false,
-        isDocPreviewOpen: false,
-        activeProfileTab: 'profile',
-        docPreviewUrl: '',
-        docPreviewTitle: '',
-        selectedStudentName: '',
-        selectedAdmissionId: '',
-        selectedStatus: '',
-        search: '',
-        classFilter: 'All',
-        streamFilter: 'All',
-        statusFilter: 'All',
-        audience: 'all',
-        subject: '',
-        message: '',
-        showToast: false,
-        toastMessage: '',
-        profileStudent: {
-            id: '', userId: '', name: '', email: '', phone: '', enrollmentNumber: '',
-            class: '', stream: '', status: '',
-            docs: { photo:'', signature:'', idProof:'', addressProof:'', previousMarksheet:'', categoryCertificate:'' },
-            tmaSubmissions: []
-        },
-        enrollmentInput: '',
-        savingEnrollment: false,
-        openProfile(student) {
-            this.profileStudent = student;
-            this.enrollmentInput = student.enrollmentNumber;
-            this.activeProfileTab = 'profile';
-            this.isProfileDrawerOpen = true;
-        },
-        saveEnrollment() {
-            if (!this.enrollmentInput.trim()) return;
-            this.savingEnrollment = true;
-            fetch(`/admin/students/${this.profileStudent.userId}/enrollment`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
-                body: JSON.stringify({ enrollment_number: this.enrollmentInput })
-            })
-            .then(r => r.json())
-            .then(data => {
-                this.savingEnrollment = false;
-                if (data.success) {
-                    this.profileStudent.enrollmentNumber = this.enrollmentInput;
-                    this.toastMessage = 'Enrollment number updated!';
-                    this.showToast = true;
-                    setTimeout(() => this.showToast = false, 3000);
-                } else {
-                    alert(data.message || 'Failed to update enrollment number.');
-                }
-            })
-            .catch(() => { this.savingEnrollment = false; alert('Network error.'); });
-        },
-        saveTmaMarks(sub) {
-            sub.saving = true;
-            fetch(`/admin/tma-submissions/${sub.id}/marks`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
-                body: JSON.stringify({ tma_marks: sub.tmaMarks || null, practical_marks: sub.practicalMarks || null, admin_remarks: sub.remarks || '' })
-            })
-            .then(r => r.json())
-            .then(data => {
-                sub.saving = false;
-                if (data.success) {
-                    sub.status = 'graded';
-                    this.toastMessage = 'Marks saved for ' + sub.tmaTitle + '!';
-                    this.showToast = true;
-                    setTimeout(() => this.showToast = false, 3500);
-                } else {
-                    alert(data.message || 'Failed to save marks.');
-                }
-            })
-            .catch(() => { sub.saving = false; alert('Network error.'); });
-        },
-        openDocPreview(url, title) {
-            this.docPreviewUrl = url;
-            this.docPreviewTitle = title;
-            this.isDocPreviewOpen = true;
-        },
-        downloadDoc(url, filename) {
-            if (!url || url === '/storage/') return;
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename || 'document';
-            a.target = '_blank';
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        },
-        exportCSV() {
-            let csvContent = 'ID,Name,Email,Enrollment,Class,Stream,Status\\n';
-            const studentsData = [
-                @foreach($students as $student)
-                    @php
-                        $latestAdmission = $student->admissions->first();
-                        $studentId = "BSP-" . ($student->created_at ? $student->created_at->format('Y') : '2026') . "-" . str_pad($student->id, 4, '0', STR_PAD_LEFT);
-                        $class = 'Not Submitted'; $stream = 'Pending';
-                        if ($latestAdmission) {
-                            if ($latestAdmission->course_type === '10th') { $class = '10th Grade'; $stream = 'Foundation'; }
-                            elseif ($latestAdmission->course_type === '12th') { $class = '12th Grade'; $stream = ($student->id % 2 === 0) ? 'Engineering (PCM)' : 'Medical (PCMB)'; }
-                        }
-                        $progress = ($student->id * 17) % 61 + 40;
-                        $status = ($latestAdmission && $latestAdmission->status === 'Approved') ? 'Active' : 'On-Hold';
-                    @endphp
-                    { id: '{{ $studentId }}', name: '{{ addslashes($student->name) }}', email: '{{ addslashes($student->email) }}',
-                      enrollment: '{{ $student->enrollment_number ?? 'N/A' }}', class: '{{ $class }}',
-                      stream: '{{ $stream }}', status: '{{ $status }}' },
-                @endforeach
-            ];
-            studentsData.forEach(row => {
-                csvContent += `\"${row.id}\",\"${row.name}\",\"${row.email}\",\"${row.enrollment}\",\"${row.class}\",\"${row.stream}\",\"${row.status}\"\n`;
-            });
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.setAttribute('href', url);
-            link.setAttribute('download', `students_${new Date().toISOString().slice(0,10)}.csv`);
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        }
-    }" class="relative w-full min-h-screen">
+    <div x-data="studentManager" class="relative w-full min-h-screen">
 
         
         <!-- Floating Abstract Background Elements -->
@@ -239,108 +118,82 @@
             <div x-init="toastMessage = '{{ session('success') }}'; showToast = true; setTimeout(() => showToast = false, 4000)" style="display: none;"></div>
         @endif
 
-        <!-- Top Header Area -->
-        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-10">
-            <div>
-                <h1 class="text-[clamp(2rem,5vw,2.5rem)] font-extrabold tracking-tight text-on-background mb-2">Student Management</h1>
-                <p class="text-on-surface-variant font-medium">Monitoring and orchestrating the next generation of academic leaders.</p>
+        <!-- Header Section -->
+        <section class="space-y-2 mb-8">
+            <div class="flex items-center gap-3 text-primary/60 font-medium text-sm tracking-widest uppercase">
+                <span class="material-symbols-outlined text-sm">home</span>
+                <span class="">Dashboard</span>
+                <span class="material-symbols-outlined text-sm">chevron_right</span>
+                <span class="">Operations</span>
             </div>
-            <div class="flex gap-3 w-full sm:w-auto">
-                <button @click="exportCSV()" class="flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-outline-variant/35 font-bold text-sm bg-white hover:bg-surface-container-low transition-colors text-on-surface w-full sm:w-auto">
-                    <span class="material-symbols-outlined text-lg">download</span>
-                    Export CSV
-                </button>
-                <button @click="isMessageModalOpen = true; audience = 'all';" class="btn-primary text-on-primary px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all w-full sm:w-auto">
-                    <span class="material-symbols-outlined">mail</span>
-                    Broadcast
-                </button>
-                <button @click="isAddStudentModalOpen = true" class="btn-primary text-on-primary px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all w-full sm:w-auto">
-                    <span class="material-symbols-outlined">person_add</span>
-                    Quick Add Student
-                </button>
-            </div>
-        </header>
-
-        <!-- Metrics Grid -->
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <!-- Metric 1 -->
-            <div class="glass-card p-6 rounded-3xl group hover:border-primary/30 transition-all">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="p-3 bg-primary/10 text-primary rounded-2xl">
-                        <span class="material-symbols-outlined">group</span>
-                    </div>
-                    <span class="text-xs font-bold text-primary px-2 py-1 bg-primary/5 rounded-full">+{{ round(($students->count() / max($students->count(), 1)) * 10) }}% this month</span>
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                <div>
+                    <h2 class="text-4xl font-headline font-bold text-on-surface -tracking-wide">Student Management</h2>
+                    <p class="text-on-surface-variant mt-1 text-base">Centralized registry of all enrolled and pending students.</p>
                 </div>
-                <p class="text-on-surface-variant text-sm font-medium uppercase tracking-widest">Total Registered Students</p>
-                <h3 class="text-3xl font-bold mt-1">{{ $students->count() }}</h3>
-            </div>
-            <!-- Metric 2 -->
-            <div class="glass-card p-6 rounded-3xl group hover:border-error/30 transition-all">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="p-3 bg-error-container/10 text-error rounded-2xl">
-                        <span class="material-symbols-outlined">verified_user</span>
+                <div class="flex gap-4 w-full md:w-auto">
+                    <div class="flex-1 px-6 py-2 glass-card rounded-xl border-outline-variant/10 text-center">
+                        <span class="block text-xs font-label text-on-surface-variant uppercase tracking-tighter">Total Students</span>
+                        <span class="text-2xl font-bold text-primary">{{ $students->count() }}</span>
                     </div>
-                    <span class="text-xs font-bold text-error px-2 py-1 bg-error-container/5 rounded-full">High Priority</span>
-                </div>
-                <p class="text-on-surface-variant text-sm font-medium uppercase tracking-widest">Pending Verifications</p>
-                <h3 class="text-3xl font-bold mt-1">{{ $pendingCount }}</h3>
-            </div>
-            <!-- Metric 3 -->
-            <div class="glass-card p-6 rounded-3xl group hover:border-secondary/30 transition-all">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="p-3 bg-secondary/10 text-secondary rounded-2xl">
-                        <span class="material-symbols-outlined">auto_graph</span>
+                    <div class="flex-1 px-6 py-2 glass-card rounded-xl border-outline-variant/10 text-center">
+                        <span class="block text-xs font-label text-on-surface-variant uppercase tracking-tighter">Pending Reviews</span>
+                        <span class="text-2xl font-bold text-secondary">{{ $pendingCount }}</span>
                     </div>
-                    <span class="text-xs font-bold text-secondary px-2 py-1 bg-secondary/5 rounded-full">Target: 95%</span>
                 </div>
-                <p class="text-on-surface-variant text-sm font-medium uppercase tracking-widest">Academic Success Rate</p>
-                <h3 class="text-3xl font-bold mt-1">91.4%</h3>
             </div>
         </section>
 
-        <!-- Search & Filters -->
-        <section class="glass-card p-4 rounded-2xl mb-8 flex flex-wrap items-center gap-4">
-            <div class="flex-1 min-w-[280px] relative">
-                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-                <input x-model="search" class="w-full bg-surface-container-low/50 border-none rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-primary/20 text-sm placeholder:text-on-surface-variant/50 text-on-surface" placeholder="Search by student name, ID or email..." type="text"/>
+        <!-- Control Bar -->
+        <section class="glass-card p-4 rounded-2xl flex flex-wrap items-center gap-4 shadow-[0_20px_50px_rgba(0,0,0,0.02)] mb-8">
+            <div class="flex-1 min-w-[280px]">
+                <div class="relative">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+                    <input x-model="search" class="w-full pl-12 pr-4 py-3 bg-surface-container-low/50 border-none rounded-xl focus:ring-2 focus:ring-primary/40 text-body-md transition-all placeholder:text-on-surface-variant/50 text-on-surface" placeholder="Search Students by name, email, roll, or mobile..." type="text">
+                </div>
             </div>
-            <select x-model="classFilter" class="bg-surface-container-low/50 border-none rounded-xl py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20 text-on-surface">
-                <option value="All">Class: All</option>
-                <option value="10th Grade">10th Grade</option>
-                <option value="12th Grade">12th Grade</option>
-                <option value="Not Submitted">Not Submitted</option>
-            </select>
-            <select x-model="streamFilter" class="bg-surface-container-low/50 border-none rounded-xl py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20 text-on-surface">
-                <option value="All">Stream: All</option>
-                <option value="Medical (PCMB)">Medical (PCMB)</option>
-                <option value="Engineering (PCM)">Engineering (PCM)</option>
-                <option value="Foundation">Foundation</option>
-                <option value="Pending">Pending</option>
-            </select>
-            <select x-model="statusFilter" class="bg-surface-container-low/50 border-none rounded-xl py-3 px-4 text-sm focus:ring-2 focus:ring-primary/20 text-on-surface">
-                <option value="All">Status: All</option>
-                <option value="Active">Active</option>
-                <option value="On-Hold">On-Hold</option>
-            </select>
-            <button @click="search = ''; classFilter = 'All'; streamFilter = 'All'; statusFilter = 'All';" class="p-3 bg-surface-container-highest/50 rounded-xl hover:bg-surface-container-highest transition-colors flex items-center justify-center" title="Reset Filters">
-                <span class="material-symbols-outlined text-sm">tune</span>
-            </button>
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="relative">
+                    <select x-model="streamFilter" class="appearance-none pl-4 pr-10 py-3 bg-surface-container-low/50 border-none rounded-xl focus:ring-2 focus:ring-primary/40 text-on-surface text-sm font-medium transition-all min-w-[140px]">
+                        <option value="All">All Streams</option>
+                        <option value="Medical (PCMB)">Medical</option>
+                        <option value="Engineering (PCM)">Engineering</option>
+                        <option value="Foundation">Foundation</option>
+                        <option value="Pending">Pending</option>
+                    </select>
+                    <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+                </div>
+                <div class="relative">
+                    <select x-model="statusFilter" class="appearance-none pl-4 pr-10 py-3 bg-surface-container-low/50 border-none rounded-xl focus:ring-2 focus:ring-primary/40 text-on-surface text-sm font-medium transition-all min-w-[140px]">
+                        <option value="All">All Status</option>
+                        <option value="Active">Active</option>
+                        <option value="On-Hold">On-Hold</option>
+                    </select>
+                    <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+                </div>
+                <button @click="exportCSV()" class="flex items-center gap-2 signature-gradient text-on-primary px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all active:scale-95 group">
+                    <span class="material-symbols-outlined group-hover:rotate-12 transition-transform">download</span>
+                    Export Student Data
+                </button>
+            </div>
         </section>
 
-        <!-- Data Table -->
-        <section class="glass-card rounded-3xl overflow-hidden mb-12">
+        <!-- Student List Table -->
+        <section class="glass-card rounded-3xl overflow-hidden shadow-2xl mb-8">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="border-b border-outline-variant/10 bg-surface-container-low/50">
-                            <th class="px-6 py-5 text-xs font-bold uppercase tracking-widest text-on-surface-variant">Student Details</th>
-                            <th class="px-6 py-5 text-xs font-bold uppercase tracking-widest text-on-surface-variant">Class / Stream</th>
-                            <th class="px-6 py-5 text-xs font-bold uppercase tracking-widest text-on-surface-variant">Performance</th>
-                            <th class="px-6 py-5 text-xs font-bold uppercase tracking-widest text-on-surface-variant">Status</th>
-                            <th class="px-6 py-5 text-xs font-bold uppercase tracking-widest text-on-surface-variant text-right">Actions</th>
+                        <tr class="bg-surface-container-high/20 border-b border-outline-variant/10">
+                            <th class="px-6 py-5 font-bold text-sm text-on-surface-variant uppercase tracking-wider">Student Name</th>
+                            <th class="px-6 py-5 font-bold text-sm text-on-surface-variant uppercase tracking-wider">Ref / Enroll</th>
+                            <th class="px-6 py-5 font-bold text-sm text-on-surface-variant uppercase tracking-wider">Contact Details</th>
+                            <th class="px-6 py-5 font-bold text-sm text-on-surface-variant uppercase tracking-wider">Stream</th>
+                            <th class="px-6 py-5 font-bold text-sm text-on-surface-variant uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-5 font-bold text-sm text-on-surface-variant uppercase tracking-wider">Payment</th>
+                            <th class="px-6 py-5 text-right"></th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-outline-variant/5">
+                    <tbody class="divide-y divide-outline-variant/10">
                         @forelse($students as $student)
                             @php
                                 $latestAdmission = $student->admissions->first();
@@ -361,9 +214,6 @@
                                     }
                                 }
                                 
-                                // Dynamic Progress logic: deterministic based on student id
-                                $progress = ($student->id * 17) % 61 + 40;
-                                
                                 // Determine Status
                                 $status = 'On-Hold';
                                 if ($latestAdmission && $latestAdmission->status === 'Approved') {
@@ -371,57 +221,123 @@
                                 }
                                 
                                 $statusClass = ($status === 'Active') 
-                                    ? 'bg-primary/10 text-primary border border-primary/20' 
-                                    : 'bg-surface-container-high text-on-surface-variant border border-outline-variant/30';
+                                    ? 'bg-green-100 text-green-700' 
+                                    : 'bg-yellow-100 text-yellow-700';
+                                
+                                // Determine Payment Status
+                                $successfulPaymentsCount = $student->payments->where('status', 'Success')->count();
+                                if ($successfulPaymentsCount > 0) {
+                                    $paymentStatusLabel = 'Paid';
+                                    $paymentStatusClass = 'bg-primary/10 text-primary';
+                                } else {
+                                    $paymentStatusLabel = 'Unpaid';
+                                    $paymentStatusClass = 'bg-error/10 text-error';
+                                }
                                 
                                 // Dynamic UI Avatar
                                 $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($student->name) . '&background=006479&color=fff&bold=true&size=128';
+                                $docs = $latestAdmission ? ($latestAdmission->documents ?? []) : [];
+                                $photoUrl = (!empty($docs['photo']) && str_starts_with($docs['photo'], 'admissions/')) ? '/storage/' . $docs['photo'] : $avatarUrl;
                             @endphp
-                            <!-- Student Row -->
                             <tr 
-                                x-show="(search === '' || '{{ strtolower($student->name) }}'.includes(search.toLowerCase()) || '{{ strtolower($student->email) }}'.includes(search.toLowerCase()) || '{{ strtolower($studentId) }}'.includes(search.toLowerCase())) &&
-                                        (classFilter === 'All' || classFilter === '{{ $class }}') &&
-                                        (streamFilter === 'All' || streamFilter === '{{ $stream }}') &&
-                                        (statusFilter === 'All' || statusFilter === '{{ $status }}')"
-                                class="hover:bg-surface-container-low/30 hover:-translate-y-0.5 transition-all duration-300 group"
+                                x-show="(search === '' || '{{ addslashes(strtolower($student->name)) }}'.includes(search.toLowerCase()) || '{{ addslashes(strtolower($student->email)) }}'.includes(search.toLowerCase()) || '{{ addslashes(strtolower($studentId)) }}'.includes(search.toLowerCase()) || '{{ addslashes(strtolower($latestAdmission ? $latestAdmission->mobile_number : '')) }}'.includes(search.toLowerCase())) &&
+                                        (streamFilter === 'All' || streamFilter === '{{ addslashes($stream) }}') &&
+                                        (statusFilter === 'All' || statusFilter === '{{ addslashes($status) }}')"
+                                class="hover:bg-surface-container-lowest/40 transition-colors group"
                             >
-                                <td class="px-6 py-4">
+                                <td class="px-6 py-5">
                                     <div class="flex items-center gap-4">
-                                        <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white group-hover:border-primary/20 transition-all flex items-center justify-center shadow-sm">
-                                            <img alt="{{ $student->name }}" class="w-full h-full object-cover" src="{{ $avatarUrl }}"/>
+                                        <div class="relative flex-shrink-0">
+                                            <img class="w-12 h-12 rounded-full object-cover border-2 border-primary/10 group-hover:border-primary transition-all shadow-sm" alt="{{ $student->name }}" src="{{ $photoUrl }}">
+                                            <span class="absolute bottom-0 right-0 w-3 h-3 border-2 border-white rounded-full {{ $status === 'Active' ? 'bg-green-500' : 'bg-yellow-500' }}"></span>
                                         </div>
                                         <div>
-                                            <p class="font-bold text-on-background">{{ $student->name }}</p>
-                                            <p class="text-xs text-on-surface-variant font-medium">ID: {{ $studentId }}</p>
+                                            <p class="font-bold text-on-surface text-base">{{ $student->name }}</p>
+                                            <p class="text-xs text-on-surface-variant">Joined: {{ $student->created_at ? $student->created_at->format('d M Y') : 'N/A' }}</p>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <p class="text-sm font-semibold text-on-background">{{ $class }}</p>
-                                    <p class="text-xs text-secondary font-medium">{{ $stream }}</p>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="w-40">
-                                        <div class="flex justify-between mb-1">
-                                            <span class="text-xs font-bold text-on-background">Progress</span>
-                                            <span class="text-xs font-bold text-primary">{{ $progress }}%</span>
-                                        </div>
-                                        <div class="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden">
-                                            <div class="h-full bg-primary rounded-full" style="width: {{ $progress }}%"></div>
-                                        </div>
+                                <td class="px-6 py-5">
+                                    <div class="text-sm">
+                                        <p class="text-on-surface font-medium">REF: {{ $latestAdmission ? $latestAdmission->reference_number : 'N/A' }}</p>
+                                        <p class="text-primary font-bold">ENR: {{ $student->enrollment_number ?? 'N/A' }}</p>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4">
-                                    <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider {{ $statusClass }}">
-                                        {{ $status }}
+                                <td class="px-6 py-5 text-sm">
+                                    <p class="text-on-surface">{{ $latestAdmission->mobile_number ?? 'N/A' }}</p>
+                                    <p class="text-on-surface-variant">{{ $student->email }}</p>
+                                </td>
+                                <td class="px-6 py-5">
+                                    <span class="px-3 py-1 bg-secondary-container/40 text-on-secondary-container text-xs font-bold rounded-full uppercase tracking-tighter">{{ $stream }}</span>
+                                </td>
+                                <td class="px-6 py-5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold {{ $statusClass }}">
+                                        <span class="w-1.5 h-1.5 rounded-full {{ $status === 'Active' ? 'bg-green-500' : 'bg-yellow-500' }}"></span> {{ $status }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 text-right">
-                                    <div class="flex justify-end gap-2">
-                                        <button @click="isMessageModalOpen = true; audience = '{{ $student->email }}';" class="p-2 hover:bg-primary/10 text-primary rounded-lg transition-colors flex items-center justify-center" title="Message Student">
-                                            <span class="material-symbols-outlined text-[20px]">chat</span>
+                                <td class="px-6 py-5">
+                                    <span class="px-3 py-1 rounded-full text-xs font-bold {{ $paymentStatusClass }}">{{ $paymentStatusLabel }}</span>
+                                </td>
+                                <td class="px-6 py-5 text-right">
+                                    @php
+                                        $tmaData = $student->tmaSubmissions->map(function($sub) {
+                                            return [
+                                                'id' => $sub->id,
+                                                'tmaTitle' => $sub->product ? $sub->product->title : 'TMA',
+                                                'status' => $sub->status,
+                                                'filePath' => $sub->file_path ? '/storage/' . $sub->file_path : null,
+                                                'originalFilename' => $sub->original_filename,
+                                                'tmaMarks' => $sub->tma_marks,
+                                                'practicalMarks' => $sub->practical_marks,
+                                                'remarks' => $sub->admin_remarks,
+                                                'submittedAt' => $sub->submitted_at ? $sub->submitted_at->format('d M Y') : null,
+                                                'saving' => false,
+                                            ];
+                                        })->values()->toArray();
+                                        
+                                        $allTmaData = $allTmas->map(function($tma) use ($student) {
+                                            $sub = $student->tmaSubmissions->firstWhere('product_id', $tma->id);
+                                            return [
+                                                'tmaProductId' => $tma->id,
+                                                'tmaTitle' => $tma->title,
+                                                'id' => $sub ? $sub->id : null,
+                                                'status' => $sub ? $sub->status : 'not_submitted',
+                                                'filePath' => ($sub && $sub->file_path) ? '/storage/' . $sub->file_path : null,
+                                                'originalFilename' => $sub ? $sub->original_filename : null,
+                                                'tmaMarks' => $sub ? $sub->tma_marks : null,
+                                                'practicalMarks' => $sub ? $sub->practical_marks : null,
+                                                'remarks' => $sub ? $sub->admin_remarks : null,
+                                                'submittedAt' => ($sub && $sub->submitted_at) ? $sub->submitted_at->format('d M Y') : null,
+                                                'saving' => false,
+                                            ];
+                                        })->values()->toArray();
+                                        
+                                        $profileData = [
+                                            'id' => $studentId,
+                                            'userId' => $student->id,
+                                            'name' => $student->name,
+                                            'email' => $student->email,
+                                            'phone' => $latestAdmission ? $latestAdmission->mobile_number : '',
+                                            'enrollmentNumber' => $student->enrollment_number ?? '',
+                                            'class' => $class,
+                                            'stream' => $stream,
+                                            'status' => $status,
+                                            'docs' => [
+                                                'photo' => $docs['photo'] ?? '',
+                                                'signature' => $docs['signature'] ?? '',
+                                                'idProof' => $docs['idProof'] ?? '',
+                                                'addressProof' => $docs['addressProof'] ?? '',
+                                                'previousMarksheet' => $docs['previousMarksheet'] ?? '',
+                                                'categoryCertificate' => $docs['categoryCertificate'] ?? '',
+                                            ],
+                                            'tmaSubmissions' => $allTmaData,
+                                        ];
+                                    @endphp
+                                    <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button @click="openProfile({{ json_encode($profileData) }})" class="p-2 hover:bg-primary/10 rounded-lg text-primary transition-colors" title="View Profile">
+                                            <span class="material-symbols-outlined">visibility</span>
                                         </button>
-                                        <button
+                                        <button 
                                             @click="
                                                 selectedAdmissionId = '{{ $latestAdmission ? $latestAdmission->id : '' }}';
                                                 selectedStudentName = '{{ addslashes($student->name) }}';
@@ -431,83 +347,21 @@
                                                 } else {
                                                     alert('No admission record found for this student.');
                                                 }
-                                            "
-                                            class="p-2 hover:bg-secondary/10 text-secondary rounded-lg transition-colors flex items-center justify-center"
-                                            title="Update Status"
+                                            " 
+                                            class="p-2 hover:bg-secondary/10 text-secondary rounded-lg transition-colors" 
+                                            title="Edit Student"
                                         >
-                                            <span class="material-symbols-outlined text-[20px]">edit</span>
+                                            <span class="material-symbols-outlined">edit</span>
                                         </button>
-                                        @php
-                                            $docs = $latestAdmission ? ($latestAdmission->documents ?? []) : [];
-                                            $tmaData = $student->tmaSubmissions->map(function($sub) {
-                                                return [
-                                                    'id' => $sub->id,
-                                                    'tmaTitle' => $sub->product ? $sub->product->title : 'TMA',
-                                                    'status' => $sub->status,
-                                                    'filePath' => $sub->file_path ? '/storage/' . $sub->file_path : null,
-                                                    'originalFilename' => $sub->original_filename,
-                                                    'tmaMarks' => $sub->tma_marks,
-                                                    'practicalMarks' => $sub->practical_marks,
-                                                    'remarks' => $sub->admin_remarks,
-                                                    'submittedAt' => $sub->submitted_at ? $sub->submitted_at->format('d M Y') : null,
-                                                    'saving' => false,
-                                                ];
-                                            })->values()->toArray();
-                                            $allTmaData = $allTmas->map(function($tma) use ($tmaData) {
-                                                $existing = collect($tmaData)->firstWhere('id', fn($s) => false); // placeholder
-                                                $sub = $student->tmaSubmissions->firstWhere('product_id', $tma->id);
-                                                return [
-                                                    'tmaProductId' => $tma->id,
-                                                    'tmaTitle' => $tma->title,
-                                                    'id' => $sub ? $sub->id : null,
-                                                    'status' => $sub ? $sub->status : 'not_submitted',
-                                                    'filePath' => ($sub && $sub->file_path) ? '/storage/' . $sub->file_path : null,
-                                                    'originalFilename' => $sub ? $sub->original_filename : null,
-                                                    'tmaMarks' => $sub ? $sub->tma_marks : null,
-                                                    'practicalMarks' => $sub ? $sub->practical_marks : null,
-                                                    'remarks' => $sub ? $sub->admin_remarks : null,
-                                                    'submittedAt' => ($sub && $sub->submitted_at) ? $sub->submitted_at->format('d M Y') : null,
-                                                    'saving' => false,
-                                                ];
-                                            })->values()->toArray();
-                                        @endphp
-                                        @php
-                                            $profileData = [
-                                                'id' => $studentId,
-                                                'userId' => $student->id,
-                                                'name' => $student->name,
-                                                'email' => $student->email,
-                                                'phone' => $latestAdmission->mobile_number ?? '',
-                                                'enrollmentNumber' => $student->enrollment_number ?? '',
-                                                'class' => $class,
-                                                'stream' => $stream,
-                                                'status' => $status,
-                                                'docs' => [
-                                                    'photo' => $docs['photo'] ?? '',
-                                                    'signature' => $docs['signature'] ?? '',
-                                                    'idProof' => $docs['idProof'] ?? '',
-                                                    'addressProof' => $docs['addressProof'] ?? '',
-                                                    'previousMarksheet' => $docs['previousMarksheet'] ?? '',
-                                                    'categoryCertificate' => $docs['categoryCertificate'] ?? '',
-                                                ],
-                                                'tmaSubmissions' => $allTmaData,
-                                            ];
-                                        @endphp
-                                        <button
-                                            @click="openProfile(@json($profileData))"
-                                            class="flex items-center gap-1.5 px-3 py-2 hover:bg-primary/10 text-primary rounded-lg transition-colors text-xs font-bold border border-primary/20"
-                                            title="View Full Profile"
-                                        >
-                                            <span class="material-symbols-outlined text-[16px]">person</span>
-                                            Profile
+                                        <button @click="isMessageModalOpen = true; audience = '{{ $student->email }}';" class="p-2 hover:bg-error/10 rounded-lg text-error transition-colors" title="Message Student">
+                                            <span class="material-symbols-outlined">chat</span>
                                         </button>
                                     </div>
                                 </td>
                             </tr>
-
                         @empty
                             <tr>
-                                <td colspan="5" class="p-24 text-center">
+                                <td colspan="7" class="p-24 text-center">
                                     <div class="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mb-6 mx-auto text-primary">
                                         <span class="material-symbols-outlined text-4xl">group</span>
                                     </div>
@@ -522,90 +376,18 @@
                 </table>
             </div>
             
-            <!-- Pagination / Summary UI -->
-            <div class="px-6 py-4 bg-surface-container-lowest/50 flex justify-between items-center">
-                <p class="text-xs text-on-surface-variant font-medium font-sans">Showing 1-{{ $students->count() }} of {{ $students->count() }} students</p>
+            <!-- Pagination -->
+            <div class="px-8 py-5 border-t border-outline-variant/10 flex items-center justify-between bg-surface-container-lowest/30">
+                <p class="text-sm text-on-surface-variant">Showing <span class="font-bold text-on-surface">1 - {{ $students->count() }}</span> of <span class="font-bold text-on-surface">{{ $students->count() }}</span> students</p>
                 <div class="flex items-center gap-2">
-                    <button class="p-2 rounded-lg hover:bg-surface-container-high text-on-surface-variant disabled:opacity-30 flex items-center justify-center" disabled>
-                        <span class="material-symbols-outlined text-sm">chevron_left</span>
+                    <button class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-surface-container-high/40 text-on-surface-variant transition-all disabled:opacity-30" disabled>
+                        <span class="material-symbols-outlined">chevron_left</span>
                     </button>
-                    <button class="w-8 h-8 rounded-lg bg-primary text-on-primary text-xs font-bold flex items-center justify-center">1</button>
-                    <button class="p-2 rounded-lg hover:bg-surface-container-high text-on-surface-variant disabled:opacity-30 flex items-center justify-center" disabled>
-                        <span class="material-symbols-outlined text-sm">chevron_right</span>
+                    <button class="w-10 h-10 flex items-center justify-center rounded-xl bg-primary text-on-primary font-bold shadow-md">1</button>
+                    <button class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-surface-container-high/40 text-on-surface-variant transition-all disabled:opacity-30" disabled>
+                        <span class="material-symbols-outlined">chevron_right</span>
                     </button>
                 </div>
-            </div>
-        </section>
-
-        <!-- Enrollment & Activities Asymmetric Layout -->
-        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-            <!-- Enrollment Distribution -->
-            <div class="lg:col-span-2 glass-card p-8 rounded-3xl">
-                <h4 class="text-lg font-bold mb-6 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">analytics</span>
-                    Enrollment Distribution
-                </h4>
-                @php
-                    $count10th = \App\Models\Admission::where('course_type', '10th')->count();
-                    $count12th = \App\Models\Admission::where('course_type', '12th')->count();
-                    $totalAdmissions = $count10th + $count12th;
-                    
-                    $pct10th = $totalAdmissions > 0 ? round(($count10th / $totalAdmissions) * 100) : 40;
-                    $pct12th = $totalAdmissions > 0 ? round(($count12th / $totalAdmissions) * 100) : 60;
-                @endphp
-                <div class="flex items-end gap-6 h-48 px-4 pb-2">
-                    <!-- 10th Grade Bar -->
-                    <div class="flex-1 bg-surface-container-low rounded-t-xl relative group h-full">
-                        <div class="absolute bottom-0 w-full bg-primary rounded-t-xl transition-all duration-700" style="height: {{ $pct10th }}%"></div>
-                        <span class="absolute -top-8 left-1/2 -translate-x-1/2 text-xs font-bold bg-primary text-white px-2.5 py-1 rounded shadow-md pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                            10th Grade: {{ $count10th }} Enrolled
-                        </span>
-                        <div class="absolute bottom-[-24px] left-0 right-0 text-center text-[10px] font-bold text-on-surface-variant">10TH GRADE</div>
-                    </div>
-                    <!-- 12th Grade Bar -->
-                    <div class="flex-1 bg-surface-container-low rounded-t-xl relative group h-full">
-                        <div class="absolute bottom-0 w-full bg-secondary rounded-t-xl transition-all duration-700" style="height: {{ $pct12th }}%"></div>
-                        <span class="absolute -top-8 left-1/2 -translate-x-1/2 text-xs font-bold bg-secondary text-white px-2.5 py-1 rounded shadow-md pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                            12th Grade: {{ $count12th }} Enrolled
-                        </span>
-                        <div class="absolute bottom-[-24px] left-0 right-0 text-center text-[10px] font-bold text-on-surface-variant">12TH GRADE</div>
-                    </div>
-                    <!-- Mock Graduation Bar -->
-                    <div class="flex-1 bg-surface-container-low rounded-t-xl relative group h-full">
-                        <div class="absolute bottom-0 w-full bg-primary-container rounded-t-xl transition-all duration-700" style="height: 15%"></div>
-                        <span class="absolute -top-8 left-1/2 -translate-x-1/2 text-xs font-bold bg-primary-container text-on-primary-container px-2.5 py-1 rounded shadow-md pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                            Grads: 2 Finished
-                        </span>
-                        <div class="absolute bottom-[-24px] left-0 right-0 text-center text-[10px] font-bold text-on-surface-variant">GRADUATES</div>
-                    </div>
-                </div>
-                <div class="mt-8"></div>
-            </div>
-
-            <!-- Recent Activity -->
-            <div class="glass-card p-6 rounded-3xl flex flex-col">
-                <h4 class="text-lg font-bold mb-4 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-secondary">bolt</span>
-                    Recent Activity
-                </h4>
-                <div class="space-y-4 overflow-y-auto max-h-[250px] scrollbar-hide flex-grow">
-                    @forelse($recentAdmissions as $activity)
-                        <div class="flex gap-4 items-start border-b border-outline-variant/10 pb-3 last:border-0 last:pb-0">
-                            <div class="w-2.5 h-2.5 rounded-full bg-primary mt-1.5 flex-shrink-0"></div>
-                            <div>
-                                <p class="text-sm font-bold text-on-background">New Application</p>
-                                <p class="text-xs text-on-surface-variant font-medium">{{ $activity->full_name }} submitted {{ $activity->course_type }}th Admission Form.</p>
-                                <p class="text-[10px] text-primary font-bold mt-1 uppercase tracking-wider">{{ $activity->created_at->diffForHumans() }}</p>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="text-center py-12 text-on-surface-variant/50 text-sm flex flex-col items-center justify-center h-full">
-                            <span class="material-symbols-outlined text-3xl opacity-30 mb-2">notifications_off</span>
-                            No recent admission applications.
-                        </div>
-                    @endforelse
-                </div>
-                <a href="/admin/admissions" class="mt-auto pt-4 text-xs font-bold text-primary hover:underline text-center w-full uppercase tracking-widest block">View All Admissions</a>
             </div>
         </section>
 
@@ -1172,6 +954,132 @@
                 </div>
             </div>
         </div>
-
     </div>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('studentManager', () => ({
+                isMessageModalOpen: false,
+                isAddStudentModalOpen: false,
+                isStatusModalOpen: false,
+                isProfileDrawerOpen: false,
+                isDocPreviewOpen: false,
+                activeProfileTab: 'profile',
+                docPreviewUrl: '',
+                docPreviewTitle: '',
+                selectedStudentName: '',
+                selectedAdmissionId: '',
+                selectedStatus: '',
+                search: '',
+                classFilter: 'All',
+                streamFilter: 'All',
+                statusFilter: 'All',
+                audience: 'all',
+                subject: '',
+                message: '',
+                showToast: false,
+                toastMessage: '',
+                profileStudent: {
+                    id: '', userId: '', name: '', email: '', phone: '', enrollmentNumber: '',
+                    class: '', stream: '', status: '',
+                    docs: { photo:'', signature:'', idProof:'', addressProof:'', previousMarksheet:'', categoryCertificate:'' },
+                    tmaSubmissions: []
+                },
+                enrollmentInput: '',
+                savingEnrollment: false,
+                openProfile(student) {
+                    this.profileStudent = student;
+                    this.enrollmentInput = student.enrollmentNumber;
+                    this.activeProfileTab = 'profile';
+                    this.isProfileDrawerOpen = true;
+                },
+                saveEnrollment() {
+                    if (!this.enrollmentInput.trim()) return;
+                    this.savingEnrollment = true;
+                    fetch(`/admin/students/${this.profileStudent.userId}/enrollment`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                        body: JSON.stringify({ enrollment_number: this.enrollmentInput })
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        this.savingEnrollment = false;
+                        if (data.success) {
+                            this.profileStudent.enrollmentNumber = this.enrollmentInput;
+                            this.toastMessage = 'Enrollment number updated!';
+                            this.showToast = true;
+                            setTimeout(() => this.showToast = false, 3000);
+                        } else {
+                            alert(data.message || 'Failed to update enrollment number.');
+                        }
+                    })
+                    .catch(() => { this.savingEnrollment = false; alert('Network error.'); });
+                },
+                saveTmaMarks(sub) {
+                    sub.saving = true;
+                    fetch(`/admin/tma-submissions/${sub.id}/marks`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                        body: JSON.stringify({ tma_marks: sub.tmaMarks || null, practical_marks: sub.practicalMarks || null, admin_remarks: sub.remarks || '' })
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        sub.saving = false;
+                        if (data.success) {
+                            sub.status = 'graded';
+                            this.toastMessage = 'Marks saved for ' + sub.tmaTitle + '!';
+                            this.showToast = true;
+                            setTimeout(() => this.showToast = false, 3500);
+                        } else {
+                            alert(data.message || 'Failed to save marks.');
+                        }
+                    })
+                    .catch(() => { sub.saving = false; alert('Network error.'); });
+                },
+                openDocPreview(url, title) {
+                    this.docPreviewUrl = url;
+                    this.docPreviewTitle = title;
+                    this.isDocPreviewOpen = true;
+                },
+                downloadDoc(url, filename) {
+                    if (!url || url === '/storage/') return;
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename || 'document';
+                    a.target = '_blank';
+                    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                },
+                exportCSV() {
+                    let csvContent = 'ID,Name,Email,Enrollment,Class,Stream,Status\n';
+                    const studentsData = [
+                        @foreach($students as $student)
+                            @php
+                                $latestAdmission = $student->admissions->first();
+                                $studentId = "BSP-" . ($student->created_at ? $student->created_at->format('Y') : '2026') . "-" . str_pad($student->id, 4, '0', STR_PAD_LEFT);
+                                $class = 'Not Submitted'; $stream = 'Pending';
+                                if ($latestAdmission) {
+                                    if ($latestAdmission->course_type === '10th' || $latestAdmission->course_type === 'Secondary') { $class = '10th Grade'; $stream = 'Foundation'; }
+                                    elseif ($latestAdmission->course_type === '12th' || $latestAdmission->course_type === 'Senior Secondary') { $class = '12th Grade'; $stream = ($student->id % 2 === 0) ? 'Engineering (PCM)' : 'Medical (PCMB)'; }
+                                }
+                                $progress = ($student->id * 17) % 61 + 40;
+                                $status = ($latestAdmission && $latestAdmission->status === 'Approved') ? 'Active' : 'On-Hold';
+                            @endphp
+                            { id: '{{ addslashes($studentId) }}', name: '{{ addslashes($student->name) }}', email: '{{ addslashes($student->email) }}',
+                              enrollment: '{{ addslashes($student->enrollment_number ?? 'N/A') }}', class: '{{ addslashes($class) }}',
+                              stream: '{{ addslashes($stream) }}', status: '{{ addslashes($status) }}' },
+                        @endforeach
+                    ];
+                    studentsData.forEach(row => {
+                        csvContent += '"' + row.id + '","' + row.name + '","' + row.email + '","' + row.enrollment + '","' + row.class + '","' + row.stream + '","' + row.status + '"\n';
+                    });
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.setAttribute('href', url);
+                    link.setAttribute('download', `students_${new Date().toISOString().slice(0,10)}.csv`);
+                    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                }
+            }));
+        });
+    </script>
 </x-admin-layout>

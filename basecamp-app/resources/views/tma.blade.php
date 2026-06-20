@@ -45,6 +45,16 @@
                         $isGraded = $submission && $submission->status === 'graded';
                         $isSubmitted = $submission && $submission->status === 'submitted';
                         $delay = $index * 60;
+                        
+                        $deadlinePassed = $tma->deadline && \Carbon\Carbon::parse($tma->deadline)->isPast();
+                        $hasPaidLateFee = false;
+                        if ($deadlinePassed) {
+                            $hasPaidLateFee = auth()->user()->payments()
+                                ->where('type', 'TMA')
+                                ->where('payment_id', 'like', 'tma_late_' . $tma->id . '%')
+                                ->where('status', 'Success')
+                                ->exists();
+                        }
                     @endphp
                     <div class="tma-card glass rounded-2xl overflow-hidden shadow-sm border border-white/60" style="animation-delay: {{ $delay }}ms">
                         <!-- Card Header -->
@@ -121,33 +131,62 @@
                         @endif
 
                         <!-- Action Row -->
-                        <div class="px-6 pb-6 flex flex-wrap gap-3 items-center">
-                            <!-- Download Template -->
-                            <a href="{{ $templateUrl }}" target="_blank" class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:border-[#006479] hover:text-[#006479] text-slate-600 text-xs font-bold transition-all shadow-sm">
-                                <span class="material-symbols-outlined text-sm">download</span>
-                                Download Template
-                            </a>
+                        <div class="px-6 pb-6 flex flex-col gap-4">
+                            @if($deadlinePassed && $hasPaidLateFee)
+                                <div class="p-3 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-emerald-600 text-sm">check_circle</span>
+                                    <span class="text-xs font-bold text-emerald-700">Late submission fee paid successfully. Submission unlocked!</span>
+                                </div>
+                            @endif
 
-                            <!-- Upload Form -->
-                            <div x-data="{ fileName: '', uploading: false }" class="flex-1 min-w-[220px]">
-                                <form action="{{ route('tma.submit', $tma->id) }}" method="POST" enctype="multipart/form-data"
-                                      x-on:submit="uploading = true" class="flex items-center gap-2">
-                                    @csrf
-                                    <label class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-[#006479]/40 bg-cyan-50/50 hover:bg-cyan-50 text-[#006479] text-xs font-bold transition-all cursor-pointer flex-1">
-                                        <span class="material-symbols-outlined text-sm">upload_file</span>
-                                        <span x-text="fileName || '{{ $submission ? 'Re-upload Answer' : 'Upload Answer' }}'"></span>
-                                        <input type="file" name="tma_file" class="hidden" required accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                                               x-on:change="fileName = $event.target.files[0]?.name || ''">
-                                    </label>
-                                    <button type="submit"
-                                            x-bind:disabled="!fileName || uploading"
-                                            x-bind:class="(!fileName || uploading) ? 'opacity-40 cursor-not-allowed' : 'hover:bg-cyan-700'"
-                                            class="px-4 py-2.5 rounded-xl bg-[#006479] text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5">
-                                        <span class="material-symbols-outlined text-sm" x-show="!uploading">send</span>
-                                        <span class="material-symbols-outlined text-sm animate-spin" x-show="uploading" style="display:none">progress_activity</span>
-                                        <span x-text="uploading ? 'Sending...' : 'Submit'"></span>
-                                    </button>
-                                </form>
+                            <div class="flex flex-wrap gap-3 items-center w-full">
+                                <!-- Download Template -->
+                                <a href="{{ $templateUrl }}" target="_blank" class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:border-[#006479] hover:text-[#006479] text-slate-600 text-xs font-bold transition-all shadow-sm">
+                                    <span class="material-symbols-outlined text-sm">download</span>
+                                    Download Template
+                                </a>
+
+                                @if($deadlinePassed && !$hasPaidLateFee)
+                                    <!-- Late Payment Call-to-action instead of upload form -->
+                                    <div class="flex-1 min-w-[220px] flex items-center justify-between bg-red-50/50 border border-red-200/50 rounded-xl p-3">
+                                        <div>
+                                            <p class="text-xs text-red-600 font-bold flex items-center gap-1">
+                                                <span class="material-symbols-outlined text-sm">warning</span>
+                                                Deadline passed ({{ \Carbon\Carbon::parse($tma->deadline)->format('d M Y') }})
+                                            </p>
+                                            <p class="text-[10px] text-slate-500 font-medium">Late submission fee of ₹1,200 is required to upload.</p>
+                                        </div>
+                                        <form action="{{ route('payments.tma-late-fee', $tma->id) }}" method="POST" class="m-0">
+                                            @csrf
+                                            <button type="submit" class="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 hover:scale-[1.02] active:scale-95 duration-200">
+                                                <span class="material-symbols-outlined text-sm">payment</span>
+                                                Pay ₹1,200
+                                            </button>
+                                        </form>
+                                    </div>
+                                @else
+                                    <!-- Upload Form -->
+                                    <div x-data="{ fileName: '', uploading: false }" class="flex-1 min-w-[220px]">
+                                        <form action="{{ route('tma.submit', $tma->id) }}" method="POST" enctype="multipart/form-data"
+                                              x-on:submit="uploading = true" class="flex items-center gap-2 m-0">
+                                            @csrf
+                                            <label class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-[#006479]/40 bg-cyan-50/50 hover:bg-cyan-50 text-[#006479] text-xs font-bold transition-all cursor-pointer flex-1">
+                                                <span class="material-symbols-outlined text-sm">upload_file</span>
+                                                <span x-text="fileName || '{{ $submission ? 'Re-upload Answer' : 'Upload Answer' }}'"></span>
+                                                <input type="file" name="tma_file" class="hidden" required accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                       x-on:change="fileName = $event.target.files[0]?.name || ''">
+                                            </label>
+                                            <button type="submit"
+                                                    x-bind:disabled="!fileName || uploading"
+                                                    x-bind:class="(!fileName || uploading) ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#006479]'"
+                                                    class="px-4 py-2.5 rounded-xl bg-[#006479] text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5">
+                                                <span class="material-symbols-outlined text-sm" x-show="!uploading">send</span>
+                                                <span class="material-symbols-outlined text-sm animate-spin" x-show="uploading" style="display:none">progress_activity</span>
+                                                <span x-text="uploading ? 'Sending...' : 'Submit'"></span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>

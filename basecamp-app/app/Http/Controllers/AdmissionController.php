@@ -38,6 +38,7 @@ class AdmissionController extends Controller
             'studyCentreState' => 'required|string|max:255',
             'studyCentreDistrict' => 'required|string|max:255',
             'studyCentre' => 'required|string|max:255',
+            'studyMedium' => 'required|string',
         ]);
 
         $user = $request->user();
@@ -74,6 +75,7 @@ class AdmissionController extends Controller
             'studyCentreState' => $validated['studyCentreState'] ?? '',
             'studyCentreDistrict' => $validated['studyCentreDistrict'] ?? '',
             'studyCentre' => $validated['studyCentre'] ?? '',
+            'studyMedium' => $validated['studyMedium'] ?? '',
         ];
 
         // If updating, preserve existing documents unless new ones are uploaded

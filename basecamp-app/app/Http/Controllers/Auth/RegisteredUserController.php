@@ -37,18 +37,19 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $enrollmentNumber = 'TBC-' . date('Y') . '-' . strtoupper(Str::random(6));
+        // Auto-create a pending admission application with a reference number
+        $referenceNumber = 'REF-' . date('Y') . '-' . strtoupper(Str::random(6));
 
         $user = User::create([
             'name'              => $request->name,
             'email'             => $request->email,
             'password'          => Hash::make($request->password),
-            'enrollment_number' => $enrollmentNumber,
+            'enrollment_number' => null, // Left empty until admin assigns NIOS enrollment number
         ]);
 
         event(new Registered($user));
 
-        Auth::login($user);
+        // Students cannot login until admin provides Enrollment Number
 
         // Determine which course was selected from the admissions page
         $courseApplied = $request->input('course', null);
@@ -61,8 +62,7 @@ class RegisteredUserController extends Controller
             $courseLabel = $courseApplied;
         }
 
-        // Auto-create a pending admission application with a reference number
-        $referenceNumber = 'REF-' . date('Y') . '-' . strtoupper(Str::random(6));
+        // Reference number already generated above
 
         Admission::create([
             'user_id'                => $user->id,
@@ -85,7 +85,6 @@ class RegisteredUserController extends Controller
         // Redirect to success page with key info in session flash
         return redirect()->route('registration.success')
             ->with('reference_number',  $referenceNumber)
-            ->with('enrollment_number', $enrollmentNumber)
             ->with('course_applied',    $courseLabel);
     }
 }

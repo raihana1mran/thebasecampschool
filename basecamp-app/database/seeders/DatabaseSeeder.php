@@ -151,5 +151,13 @@ class DatabaseSeeder extends Seeder
             'date_of_birth' => '2005-01-01',
             'status' => 'Pending'
         ]);
+
+        // Seeding Biology Video Lesson
+        \App\Models\VideoLesson::firstOrCreate([
+            'subject' => 'Biology (314)',
+            'class_level' => 'Senior Secondary (12th)',
+        ], [
+            'playlist_url' => 'https://www.youtube.com/playlist?list=PLJtCpape_TuiytvOVnvffWeWFSimU5aiT',
+        ]);
     }
 }

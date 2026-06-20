@@ -99,15 +99,36 @@
                             @endif
                             <span class="absolute top-2 left-2 bg-white/80 text-[9px] font-bold text-slate-500 px-1.5 py-0.5 rounded uppercase">{{ $product->category }}</span>
                         </div>
+                        @php
+                            $unlockedProducts = Auth::user()->unlocked_products ?? [];
+                            $isUnlocked = in_array((string)$product->id, $unlockedProducts) || in_array($product->id, $unlockedProducts);
+                            $isPaid = $product->price > 0;
+                            $fileUrls = $product->file_urls;
+                            if (is_string($fileUrls)) {
+                                $fileUrls = json_decode($fileUrls, true) ?: [];
+                            }
+                            $fileUrl = '#';
+                            if (is_array($fileUrls) && count($fileUrls) > 0) {
+                                $fileUrl = str_starts_with($fileUrls[0], 'http') ? $fileUrls[0] : asset('storage/' . $fileUrls[0]);
+                            }
+                        @endphp
                         <div class="p-3 sm:p-4 flex flex-col flex-1">
                             <h3 class="font-bold text-xs sm:text-sm text-slate-800 mb-1 leading-tight">{{ $product->title }}</h3>
                             <p class="text-[9px] sm:text-[10px] text-slate-400 mb-3 flex-1 line-clamp-2">{{ $product->description ?? 'No description' }}</p>
+                            
+                            @if(!$isPaid || $isUnlocked)
+                            <a href="{{ $fileUrl }}" target="_blank" class="w-full py-2 bg-cyan-600 text-white rounded-lg text-[10px] sm:text-xs font-bold hover:bg-cyan-700 flex items-center justify-center gap-1.5 min-h-[36px] sm:min-h-[40px] shadow-sm">
+                                <span class="material-symbols-outlined text-sm">download</span>
+                                <span>Download</span>
+                            </a>
+                            @else
                             <button @click="addToBasket({ id: {{ $product->id }}, title: '{{ addslashes($product->title) }}', price: '{{ $product->price }}', icon: '{{ $icons[$c] }}' })"
                                 class="w-full py-2 rounded-lg text-[10px] sm:text-xs font-bold transition-all min-h-[36px] sm:min-h-[40px] flex items-center justify-center gap-1.5"
                                 :class="basket.find(p => p.id === {{ $product->id }}) ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'signature-gradient text-white hover:opacity-90'">
-                                <span class="material-symbols-outlined text-sm" x-text="basket.find(p => p.id === {{ $product->id }}) ? 'check' : 'add_shopping_cart'"></span>
-                                <span x-text="basket.find(p => p.id === {{ $product->id }}) ? 'Added' : 'Add to Basket'"></span>
+                                <span class="material-symbols-outlined text-sm" x-text="basket.find(p => p.id === {{ $product->id }}) ? 'check' : 'lock_open'"></span>
+                                <span x-text="basket.find(p => p.id === {{ $product->id }}) ? 'Added to Basket' : 'Unlock for ₹{{ $product->price }}'"></span>
                             </button>
+                            @endif
                         </div>
                     </div>
                 @empty
@@ -133,7 +154,7 @@
             <div @click.stop class="relative w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200 max-h-[85dvh] flex flex-col overflow-hidden">
                 <!-- Header -->
                 <div class="flex items-center justify-between p-4 sm:p-6 border-b border-slate-100 shrink-0">
-                    <h2 class="text-base sm:text-lg font-bold text-slate-800" x-text="checkoutStep === 'basket' ? 'Your Basket' : checkoutStep === 'payment' ? 'Checkout' : 'Download Files'"></h2>
+                    <h2 class="text-base sm:text-lg font-bold text-slate-800" x-text="checkoutStep === 'basket' ? 'Your Basket' : checkoutStep === 'payment' ? 'Checkout' : 'Get Files'"></h2>
                     <button @click="closeCheckout()" class="p-1.5 hover:bg-slate-100 rounded-full text-slate-400"><span class="material-symbols-outlined">close</span></button>
                 </div>
 
@@ -203,7 +224,7 @@
                                 <template x-for="(url, i) in item.urls" :key="i">
                                     <a :href="url" target="_blank" class="flex items-center gap-2 px-3 py-2 bg-cyan-50 text-cyan-700 rounded-lg text-[10px] font-bold hover:bg-cyan-100 transition-colors w-full">
                                         <span class="material-symbols-outlined text-sm">download</span>
-                                        <span x-text="'Download ' + (item.urls.length > 1 ? 'File ' + (i+1) : '')"></span>
+                                        <span x-text="'Get ' + (item.urls.length > 1 ? 'File ' + (i+1) : '')"></span>
                                     </a>
                                 </template>
                             </div>

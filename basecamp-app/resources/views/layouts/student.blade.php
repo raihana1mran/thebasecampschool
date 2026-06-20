@@ -177,13 +177,7 @@
             ['label' => __('learning'),        'icon' => 'school',            'url' => url('/learning')],
             ['label' => __('mock_tests'),      'icon' => 'quiz',              'url' => url('/mocktests')],
             ['label' => __('assignments'),     'icon' => 'assignment',        'url' => url('/tma')],
-            ['label' => __('resources'),       'icon' => 'folder_open',       'url' => url('/downloads'),
-                'sub' => [
-                    ['label' => __('all_resources'), 'url' => url('/downloads')],
-                    ['label' => __('pdf_notes'),     'url' => url('/downloads?category=pdf')],
-                    ['label' => __('tma_files'),     'url' => url('/downloads?category=tma')],
-                ]
-            ],
+            ['label' => __('resources'),       'icon' => 'folder_open',       'url' => url('/downloads')],
             ['label' => __('referrals'),      'icon' => 'group_add',         'url' => url('/referrals')],
             ['label' => __('membership'),     'icon' => 'workspace_premium', 'url' => url('/membership')],
         ];
